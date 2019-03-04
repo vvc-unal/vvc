@@ -1,0 +1,14 @@
+name: vvc
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - cudatoolkit=8
+  - python=3.5
+  - keras-gpu=2.1
+  - opencv=3.3.1
+  - pip:
+    - scikit-video~=1.1
+    - glances
+    - nvidia-ml-py3
+    - ffmpeg-python~=0.1
