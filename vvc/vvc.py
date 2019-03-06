@@ -21,8 +21,8 @@ from vvc.video_data import VideoData
 
 base_folder = os.path.join(os.environ['HOME'], 'workspace/Maestria/')
 video_folder = os.path.join(base_folder, 'Videos/')
-output_folder = os.path.join(video_folder, 'Output/')
-model_folder = os.path.join(base_folder, 'Model/keras-frcnn/')
+output_folder = os.path.join(video_folder, 'frcnn-restnet50-tunned/')
+model_folder = os.path.join(base_folder, 'Model/frcnn-restnet50-tunned/')
 
 videoName = 'MOV_0861'
 input_video_file = os.path.abspath(video_folder + videoName + ".mp4")
@@ -49,7 +49,6 @@ def cleanup():
 
 def format_img(img, C):
 	img_min_side = float(C.im_size)
-	img_min_side = 480
 	(height, width, _) = img.shape
 
 	if width <= height:

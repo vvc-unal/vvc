@@ -5,10 +5,10 @@ from vvc import video_utils
 
 base_folder = os.path.join(os.environ['HOME'], 'workspace/Maestria/')
 video_folder = os.path.join(base_folder, 'Videos/')
-output_folder = os.path.join(video_folder, 'Output/')
-videoName = "ch4_30"
+output_folder = os.path.join(video_folder, 'frcnn-restnet50-tunned/')
+videoName = "MOV_0861"
 input_video_file = os.path.abspath(video_folder + videoName + ".mp4")
-output_video_file = os.path.abspath(output_folder + videoName + "_frcnn_test.mp4")
+output_video_file = os.path.abspath(output_folder + videoName + ".mp4")
 img_path = os.path.join(output_folder, 'tmp_input/')
 output_path = os.path.join(output_folder, 'tmp_output/')
 frame_rate = 30
