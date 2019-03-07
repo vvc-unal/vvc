@@ -21,10 +21,10 @@ from vvc.video_data import VideoData
 
 base_folder = os.path.join(os.environ['HOME'], 'workspace/Maestria/')
 video_folder = os.path.join(base_folder, 'Videos/')
-output_folder = os.path.join(video_folder, 'frcnn-restnet50-tunned/')
-model_folder = os.path.join(base_folder, 'Model/frcnn-restnet50-tunned/')
+output_folder = os.path.join(video_folder, 'frcnn-restnet50-freeze/')
+model_folder = os.path.join(base_folder, 'Model/frcnn-restnet50-freeze/')
 
-videoName = 'MOV_0861'
+videoName = 'CL 53 X CRA 60 910-911'
 input_video_file = os.path.abspath(video_folder + videoName + ".mp4")
 output_video_file = os.path.abspath(output_folder + videoName + "_frcnn.mp4")
 output_path = os.path.join(output_folder, 'tmp_output/')
