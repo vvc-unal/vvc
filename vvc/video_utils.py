@@ -31,7 +31,7 @@ def video_reader(input_video_file):
 def save_to_video(output_path, output_video_file, frame_rate):
     """ Save a sequence of images into a mp4 video file """
     
-    pattern = output_path + '*.jpg'
+    pattern = os.path.join(output_path, '*.jpg')
     
     # start the FFmpeg writing subprocess with following parameters
     (
