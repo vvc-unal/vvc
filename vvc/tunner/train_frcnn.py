@@ -62,7 +62,7 @@ if __name__ == '__main__':
 	options.config_filename = os.path.join(model_folder, 'config.pickle')
 	options.input_weight_path = tunner_config.RESNET50_H5
 	options.train_path = tunner_config.TRAIN_PATH
-	options.num_epochs = 1
+	options.num_epochs = 2
 	options.output_weight_path = os.path.join(model_folder, 'model.hdf5')
 	options.parser = 'tf_pascal_voc'
 	
@@ -269,7 +269,7 @@ if __name__ == '__main__':
 	
 				iter_num += 1
 	
-				if iter_num % 10 == 0:
+				if iter_num % 100 == 0:
 					progbar.update(iter_num, [('rpn_cls', np.mean(losses[:iter_num, 0])), ('rpn_regr', np.mean(losses[:iter_num, 1])),
 										  ('detector_cls', np.mean(losses[:iter_num, 2])), ('detector_regr', np.mean(losses[:iter_num, 3]))])
 	
