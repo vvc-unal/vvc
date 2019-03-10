@@ -8,4 +8,4 @@ video_folder = os.path.join(base_folder, 'Videos', 'original')
 
 model_folder = os.path.join(base_folder, 'Model')
 
-models = ['frcnn-resnet50', 'frcnn-resnet50-transfer']
+models = ['frcnn-resnet50', 'frcnn-resnet50-transfer', 'frcnn-resnet50-tunned']

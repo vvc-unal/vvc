@@ -56,7 +56,7 @@ if __name__ == '__main__':
 	
 	(options, args) = parser.parse_args()
 	
-	model_name = 'frcnn-resnet50-transfer'
+	model_name = 'frcnn-resnet50-tunned'
 	model_folder = os.path.join(tunner_config.MODELS_FOLDER, model_name)
 	
 	options.config_filename = os.path.join(model_folder, 'config.pickle')
@@ -148,7 +148,7 @@ if __name__ == '__main__':
 	roi_input = Input(shape=(None, 4))
 	
 	# define the base network (resnet here, can be VGG, Inception, etc)
-	shared_layers = nn.nn_base(img_input, trainable=True)
+	shared_layers = nn.nn_base(img_input, trainable=False)
 	
 	# define the RPN, built on the base layers
 	num_anchors = len(C.anchor_box_scales) * len(C.anchor_box_ratios)
