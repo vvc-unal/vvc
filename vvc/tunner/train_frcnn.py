@@ -13,7 +13,7 @@ from keras.optimizers import Adam, SGD, RMSprop
 from keras.layers import Input
 from keras.models import Model
 from keras_frcnn import config, data_generators
-from keras_frcnn import losses as losses
+from keras_frcnn import losses as frcnn_losses
 from keras_frcnn import tf_pascal_voc_parser
 import keras_frcnn.roi_helpers as roi_helpers
 from keras.utils import generic_utils
@@ -34,8 +34,8 @@ def save_config(c, filename):
 		print('Config has been written to {}, and can be loaded when testing to ensure correct results'.format(filename))
 	
 
-if __name__ == '__main__':
-	
+def train_frcnn(model_name, trainable_nn_base, ):
+
 	parser = OptionParser()
 	
 	parser.add_option("-p", "--path", dest="train_path", help="Path to training data.")
@@ -56,13 +56,12 @@ if __name__ == '__main__':
 	
 	(options, args) = parser.parse_args()
 	
-	model_name = 'frcnn-resnet50-tunned'
 	model_folder = os.path.join(tunner_config.MODELS_FOLDER, model_name)
 	
 	options.config_filename = os.path.join(model_folder, 'config.pickle')
 	options.input_weight_path = tunner_config.RESNET50_H5
 	options.train_path = tunner_config.TRAIN_PATH
-	options.num_epochs = 2
+	options.num_epochs = 4
 	options.output_weight_path = os.path.join(model_folder, 'model.hdf5')
 	options.parser = 'tf_pascal_voc'
 	
@@ -148,7 +147,7 @@ if __name__ == '__main__':
 	roi_input = Input(shape=(None, 4))
 	
 	# define the base network (resnet here, can be VGG, Inception, etc)
-	shared_layers = nn.nn_base(img_input, trainable=False)
+	shared_layers = nn.nn_base(img_input, trainable=trainable_nn_base)
 	
 	# define the RPN, built on the base layers
 	num_anchors = len(C.anchor_box_scales) * len(C.anchor_box_ratios)
@@ -172,8 +171,8 @@ if __name__ == '__main__':
 	
 	optimizer = Adam(lr=1e-5)
 	optimizer_classifier = Adam(lr=1e-5)
-	model_rpn.compile(optimizer=optimizer, loss=[losses.rpn_loss_cls(num_anchors), losses.rpn_loss_regr(num_anchors)])
-	model_classifier.compile(optimizer=optimizer_classifier, loss=[losses.class_loss_cls, losses.class_loss_regr(len(classes_count)-1)], metrics={'dense_class_{}'.format(len(classes_count)): 'accuracy'})
+	model_rpn.compile(optimizer=optimizer, loss=[frcnn_losses.rpn_loss_cls(num_anchors), frcnn_losses.rpn_loss_regr(num_anchors)])
+	model_classifier.compile(optimizer=optimizer_classifier, loss=[frcnn_losses.class_loss_cls, frcnn_losses.class_loss_regr(len(classes_count)-1)], metrics={'dense_class_{}'.format(len(classes_count)): 'accuracy'})
 	model_all.compile(optimizer='sgd', loss='mae')
 	
 	epoch_length = 1000
@@ -309,3 +308,9 @@ if __name__ == '__main__':
 				continue
 	
 	print('Training complete, exiting.')
+	
+if __name__ == '__main__':
+	train_frcnn(model_name='frcnn-resnet50-tunned', trainable_nn_base=False)
+	train_frcnn(model_name='frcnn-resnet50-transfer', trainable_nn_base=True)
+	
+	
