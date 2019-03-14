@@ -12,7 +12,6 @@ from vvc import config as vvc_config
 from vvc.detector import faster_rcnn
 from vvc.tracker import NaiveTracker
 from vvc.video_data import VideoData
-from measure_map import class_mapping
 
 class VVC(object):
 	
@@ -58,6 +57,20 @@ class VVC(object):
 		img = np.expand_dims(img, axis=0)
 		return img
 	
+	def format_img_yolo(self, img, img_min_side):
+		(height, width, _) = img.shape
+	
+		if width <= height:
+			f = img_min_side / width
+			new_height = int(f * height)
+			new_width = int(img_min_side)
+		else:
+			f = img_min_side / height
+			new_width = int(f * width)
+			new_height = int(img_min_side)
+		img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
+		return img
+	
 	def accumulate(self, l):
 		it = itertools.groupby(l, operator.itemgetter(0))
 		for key, subiter in it:
@@ -97,6 +110,10 @@ class VVC(object):
 		reader = video_utils.video_reader(self.input_video_file)
 	
 		frame_id = -1
+		
+		class_mapping = self.obj_detector.get_class_mapping()
+			
+		class_to_color = {class_mapping[v]: np.random.randint(0, 255, 3).tolist() for v in class_mapping}
 	
 		for frame in reader:
 			
@@ -109,14 +126,17 @@ class VVC(object):
 			frame_data.timestamps['start'] = datetime.now().isoformat()
 			
 			img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-			X = self.format_img(img, 600)
+			X = self.format_img_yolo(img, 600)
 	
-			img_scaled = np.transpose(X.copy()[0, (2, 1, 0), :, :], (1, 2, 0)).copy()
-			img_scaled[:, :, 0] += 123.68
-			img_scaled[:, :, 1] += 116.779
-			img_scaled[:, :, 2] += 103.939
+			if False: # Faster R-CNN
+				img_scaled = np.transpose(X.copy()[0, (2, 1, 0), :, :], (1, 2, 0)).copy()
+				img_scaled[:, :, 0] += 123.68
+				img_scaled[:, :, 1] += 116.779
+				img_scaled[:, :, 2] += 103.939
 	
-			img_scaled = img_scaled.astype(np.uint8)
+				img_scaled = img_scaled.astype(np.uint8)
+			else:
+				img_scaled = X.astype(np.uint8)
 			
 			frame_data.timestamps['preprocessing_end'] = datetime.now().isoformat()
 			
@@ -138,10 +158,6 @@ class VVC(object):
 			
 			# Plot tracking results
 			img_tracks = img_scaled.copy()
-			
-			class_mapping = self.obj_detector.get_class_mapping()
-			
-			class_to_color = {class_mapping[v]: np.random.randint(0, 255, 3).tolist() for v in class_mapping}
 			
 			for object_data in tracked_objects:
 				

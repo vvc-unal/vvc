@@ -17,7 +17,10 @@ from vvc import config as vvc_config
 class FasterRCNN(object):
     
     def __init__(self, model_name, num_rois = 32):
-        sys.setrecursionlimit(40000)
+        #sys.setrecursionlimit(40000)
+        
+        self.model_name = model_name
+        
         config_output_filename = os.path.join(vvc_config.model_folder, model_name, 'config.pickle')
     
         with open(config_output_filename, 'rb') as f_in:
