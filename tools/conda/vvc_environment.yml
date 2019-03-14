@@ -8,8 +8,8 @@ dependencies:
   - python=3.5
   - cudatoolkit=8
   - keras-gpu=2.1
-  - opencv=3.3
   - pip:
+  	- opencv-python~=3.4
     - scikit-video~=1.1
     - glances
     - nvidia-ml-py3

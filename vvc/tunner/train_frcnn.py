@@ -67,9 +67,6 @@ def train_frcnn(model_name, trainable_nn_base, ):
 	
 	os.makedirs(model_folder, exist_ok=True)
 	
-	if not options.train_path:   # if filename is not given
-		parser.error('Error: path to training data must be specified. Pass --path to command line')
-	
 	if options.parser == 'pascal_voc':
 		from keras_frcnn.pascal_voc_parser import get_data
 	elif options.parser == 'simple':
