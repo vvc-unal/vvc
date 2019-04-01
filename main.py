@@ -10,4 +10,6 @@ if __name__ == '__main__':
         elif 'yolo' in model_name:
             detector = yolo_v3.YOLOV3(model_name)
             
-        vvc.VVC('MOV_0861.mp4', detector).count()
+        vvc.VVC('CL 53 X CRA 60 910-911.mp4', detector).count()
+        
+    #vvc.VVC('MOV_0861.mp4', yolo_v3.YOLOV3('yolov3-transfer')).count()
