@@ -7,6 +7,7 @@ import shutil
 import cv2
 import json
 import numpy as np
+from pathlib import Path
 
 from vvc import video_utils, json_utils
 from vvc import config as vvc_config
@@ -83,9 +84,11 @@ class VVC(object):
 		data.video.input_file = self.input_video_file
 		data.video.output_file = self.output_video_file
 		
-		# json file
-		with open(self.input_video_file + '.json') as json_data:
-			vott = json.load(json_data)
+		# vott file
+		vott_file_path = Path(self.input_video_file + '.json')
+		if vott_file_path.exists():
+			with vott_file_path.open() as json_data:
+				vott = json.load(json_data)
 								
 		print("anotating ...")
 	
@@ -117,11 +120,11 @@ class VVC(object):
 				if len(ignore_tags) > 0:
 					box = ignore_tags[0]['box']
 					ignore_box = np.array([box['x1'], box['y1'], box['x2'], box['y2']]).astype(int)
+					(x1, y1, x2, y2) = ignore_box
+					color = [0, 0, 0]
+					cv2.rectangle(img, (x1, y1), (x2, y2), color, -1)
 			except:
 				pass
-			(x1, y1, x2, y2) = ignore_box
-			color = [0, 0, 0]
-			cv2.rectangle(img, (x1, y1), (x2, y2), color, -1)
 			
 			# Resize image
 			X = self.format_img_yolo(img, 600)
