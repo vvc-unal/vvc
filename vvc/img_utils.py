@@ -1,5 +1,3 @@
-import numpy as np
-import cv2
 
 
 def annotate_img(img_scaled, bboxes):

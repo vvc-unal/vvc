@@ -3,7 +3,6 @@
 '''
 import os
 import pickle
-import sys
 
 import cv2
 from keras import backend as K
