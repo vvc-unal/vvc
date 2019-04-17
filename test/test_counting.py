@@ -7,7 +7,7 @@ from vvc.detector import faster_rcnn, yolo_v3
 
 class CountingTestCase(unittest.TestCase):
     
-    video_name = 'Ch4_20181121073138_640x480.mp4'
+    video_name = 'MOV_0861.mp4'
 
 
     def setUp(self):
@@ -34,12 +34,4 @@ class CountingTestCase(unittest.TestCase):
                 vvc.VVC(self.video_name, detector).count()
         pass
     
-
-def suite():
-    suite = unittest.TestSuite()
-    suite.addTest(CountingTestCase('test_yolo_naive'))
-    return suite
-
-if __name__ == '__main__':
-    runner = unittest.TextTestRunner()
-    runner.run(suite())
+    

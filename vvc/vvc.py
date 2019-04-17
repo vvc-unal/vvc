@@ -11,30 +11,32 @@ from pathlib import Path
 
 from vvc import video_utils, json_utils
 from vvc import config as vvc_config
-from vvc.detector import faster_rcnn
 from vvc.tracker import NaiveTracker
 from vvc.video_data import VideoData
 
 class VVC(object):
 	
-	def __init__(self, video_name, detector):
+	def __init__(self, video_name, detector, tracker=NaiveTracker()):
 		self.model_name = detector.model_name
-		self.tracker = NaiveTracker()
+		self.tracker = tracker
 		self.video_name = video_name
 		
 		self.obj_detector = detector
 
 		self.input_video_file = os.path.join(vvc_config.video_folder, video_name)
-		self.output_folder = os.path.join(vvc_config.base_folder, 'Videos', self.model_name)
-		self.output_video_file = os.path.join(self.output_folder, video_name)
-		self.output_path = os.path.join(self.output_folder, 'tmp_output')
+		
+		video_name_no_suffix = Path(self.input_video_file).stem
+		
+		self.output_folder = os.path.join(vvc_config.output_folder, video_name_no_suffix)
+		self.output_video_file = os.path.join(self.output_folder, self.model_name + '.mp4')
+		self.output_img = os.path.join(self.output_folder, self.model_name)
 		
 
 	def cleanup(self):
 		print("cleaning up...")
-		shutil.rmtree(self.output_path, ignore_errors=True)
+		shutil.rmtree(self.output_img, ignore_errors=True)
 		
-		os.makedirs(self.output_path, exist_ok=True)
+		os.makedirs(self.output_img, exist_ok=True)
 	
 	def format_img_yolo(self, img, img_min_side):
 		(height, width, _) = img.shape
@@ -170,12 +172,12 @@ class VVC(object):
 			
 			# Save final image
 			img_scaled = img_tracks
-			cv2.imwrite(os.path.join(self.output_path, '{:05d}'.format(frame_id) + ".jpg"), img_scaled)
+			cv2.imwrite(os.path.join(self.output_img, '{:05d}'.format(frame_id) + ".jpg"), img_scaled)
 			
 			frame_data.timestamps['postprocessing_end'] = datetime.now().isoformat()
 			
 		# Save data to json file
-		json_file = os.path.join(self.output_folder, self.video_name + ".json")
+		json_file = self.output_video_file + ".json"
 		json_utils.save_to_json(data, json_file)
 		
 	def count(self):
@@ -183,10 +185,12 @@ class VVC(object):
 		
 		frame_rate = video_utils.get_avg_frame_rate(self.input_video_file)
 		
+		frame_rate = frame_rate / 10
+		
 		print("Main ...")
 		self.main()
 		
 		print("saving to video ..")
-		video_utils.save_to_video(self.output_path, self.output_video_file, frame_rate)
+		video_utils.save_to_video(self.output_img, self.output_video_file, frame_rate)
 		
 		print("Done..")
