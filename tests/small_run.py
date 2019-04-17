@@ -2,11 +2,11 @@
 '''
 import unittest
 
-from test.test_counting import CountingTestCase
+from tests.test_counting import VVCTestCase
     
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(CountingTestCase('test_yolo_naive'))
+    suite.addTest(VVCTestCase('test_yolo_naive'))
     return suite
 
 if __name__ == '__main__':

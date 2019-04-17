@@ -2,10 +2,11 @@
 '''
 import unittest
 
-from vvc import config, vvc
+from vvc import config
 from vvc.detector import faster_rcnn, yolo_v3
+from vvc.vvc import VVC
 
-class CountingTestCase(unittest.TestCase):
+class VVCTestCase(unittest.TestCase):
     
     video_name = 'MOV_0861.mp4'
 
@@ -23,7 +24,7 @@ class CountingTestCase(unittest.TestCase):
             if 'frcnn' in model_name:
                 detector = faster_rcnn.FasterRCNN(model_name)
             
-                vvc.VVC(self.video_name, detector).count()
+                VVC(detector).count(self.video_name)
         pass
     
     def test_yolo_naive(self):
@@ -31,7 +32,7 @@ class CountingTestCase(unittest.TestCase):
             if 'yolo' in model_name:
                 detector = yolo_v3.YOLOV3(model_name)
             
-                vvc.VVC(self.video_name, detector).count()
+                VVC(detector).count(self.video_name)
         pass
     
     

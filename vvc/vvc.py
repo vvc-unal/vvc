@@ -16,20 +16,10 @@ from vvc.video_data import VideoData
 
 class VVC(object):
 	
-	def __init__(self, video_name, detector, tracker=NaiveTracker()):
+	def __init__(self, detector, tracker=NaiveTracker()):
 		self.model_name = detector.model_name
-		self.tracker = tracker
-		self.video_name = video_name
-		
 		self.obj_detector = detector
-
-		self.input_video_file = os.path.join(vvc_config.video_folder, video_name)
-		
-		video_name_no_suffix = Path(self.input_video_file).stem
-		
-		self.output_folder = os.path.join(vvc_config.output_folder, video_name_no_suffix)
-		self.output_video_file = os.path.join(self.output_folder, self.model_name + '.mp4')
-		self.output_img = os.path.join(self.output_folder, self.model_name)
+		self.tracker = tracker
 		
 
 	def cleanup(self):
@@ -180,7 +170,17 @@ class VVC(object):
 		json_file = self.output_video_file + ".json"
 		json_utils.save_to_json(data, json_file)
 		
-	def count(self):
+	def count(self, video_name):
+		
+		self.video_name = video_name
+		self.input_video_file = os.path.join(vvc_config.video_folder, video_name)
+		
+		video_name_no_suffix = Path(self.input_video_file).stem
+		
+		self.output_folder = os.path.join(vvc_config.output_folder, video_name_no_suffix)
+		self.output_video_file = os.path.join(self.output_folder, self.model_name + '.mp4')
+		self.output_img = os.path.join(self.output_folder, self.model_name)
+		
 		self.cleanup()
 		
 		frame_rate = video_utils.get_avg_frame_rate(self.input_video_file)
