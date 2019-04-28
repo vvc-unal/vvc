@@ -6,4 +6,4 @@ if __name__ == '__main__':
     
     detector = yolo_v3.YOLOV3('yolov3')
             
-    VVC('CL 53 X CRA 60 910-911.mp4', detector).count()
+    VVC(detector).count('MOV_0861.mp4', filter_tags=['person'], show_obj_id=False)

@@ -39,7 +39,9 @@ class VVC(object):
 			f = img_min_side / height
 			new_width = int(f * width)
 			new_height = int(img_min_side)
+		
 		img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
+		
 		return img
 	
 	def accumulate(self, l):
@@ -70,7 +72,7 @@ class VVC(object):
 		
 		return img_box
 	
-	def main(self):
+	def main(self, filter_tags, show_obj_id):
 		
 		data = VideoData()
 		data.video.input_file = self.input_video_file
@@ -136,11 +138,15 @@ class VVC(object):
 			bboxes = self.obj_detector.predict(X)
 					
 			for bbox in bboxes:
+				
+				tag = bbox['class']
+				
 				# Save annotations
-				object_data = frame_data.add_object()
-				object_data.tag = bbox['class']
-				object_data.box = bbox['box']
-				object_data.probability = bbox['prob']
+				if not filter_tags or tag in filter_tags:
+					object_data = frame_data.add_object()
+					object_data.tag = tag
+					object_data.box = bbox['box']
+					object_data.probability = bbox['prob']
 			
 			frame_data.timestamps['detection_end'] = datetime.now().isoformat()
 			
@@ -158,6 +164,9 @@ class VVC(object):
 				color = class_to_color[object_data.tag]
 				label = '{}'.format(object_data.name)
 				
+				if not show_obj_id:
+					label = label.split(sep=' ')[0]
+				
 				img_tracks = self.plot_box(img_tracks, box, color, label)
 			
 			# Save final image
@@ -170,7 +179,7 @@ class VVC(object):
 		json_file = self.output_video_file + ".json"
 		json_utils.save_to_json(data, json_file)
 		
-	def count(self, video_name):
+	def count(self, video_name, frame_rate_factor=0.1, filter_tags=None, show_obj_id=True):
 		
 		self.video_name = video_name
 		self.input_video_file = os.path.join(vvc_config.video_folder, video_name)
@@ -185,10 +194,10 @@ class VVC(object):
 		
 		frame_rate = video_utils.get_avg_frame_rate(self.input_video_file)
 		
-		frame_rate = frame_rate / 10
+		frame_rate = frame_rate * frame_rate_factor
 		
 		print("Main ...")
-		self.main()
+		self.main(filter_tags=filter_tags, show_obj_id=show_obj_id)
 		
 		print("saving to video ..")
 		video_utils.save_to_video(self.output_img, self.output_video_file, frame_rate)
