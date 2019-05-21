@@ -29,10 +29,9 @@ class VVCTestCase(unittest.TestCase):
     
     def test_yolo_naive(self):
         for model_name in config.models:
-            if 'yolo' in model_name:
+            if 'YOLO' in model_name:
                 detector = yolo_v3.YOLOV3(model_name)
             
                 VVC(detector).count(self.video_name)
         pass
-    
     

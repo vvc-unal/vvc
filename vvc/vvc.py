@@ -179,7 +179,9 @@ class VVC(object):
 		json_file = self.output_video_file + ".json"
 		json_utils.save_to_json(data, json_file)
 		
-	def count(self, video_name, frame_rate_factor=0.1, filter_tags=None, show_obj_id=True):
+	def count(self, video_name, frame_rate_factor=0.1, 
+			filter_tags=['bicycle', 'person', 'car', 'motorbike', 'bus', 'truck'], 
+			show_obj_id=True):
 		
 		self.video_name = video_name
 		self.input_video_file = os.path.join(vvc_config.video_folder, video_name)
