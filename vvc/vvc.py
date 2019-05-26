@@ -3,6 +3,7 @@ import itertools
 import operator
 import os
 import shutil
+import sys
 
 import cv2
 import json
@@ -142,7 +143,7 @@ class VVC(object):
 				tag = bbox['class']
 				
 				# Save annotations
-				if not filter_tags or tag in filter_tags:
+				if tag in filter_tags:
 					object_data = frame_data.add_object()
 					object_data.tag = tag
 					object_data.box = bbox['box']
@@ -205,3 +206,5 @@ class VVC(object):
 		video_utils.save_to_video(self.output_img, self.output_video_file, frame_rate)
 		
 		print("Done..")
+		
+			

@@ -37,7 +37,7 @@ class NaiveTracker():
             self.last_tags_id[tag] = 1
         return tag + " " + str(self.last_tags_id[tag])
     
-    def tracking(self, detected_objects):
+    def tracking(self, detections):
         '''
         Process the new frame and return the tracking results
         '''
@@ -45,7 +45,7 @@ class NaiveTracker():
         for tracked in self.tracked_objects:
             tracked.deactivate()
         
-        for detected in detected_objects:
+        for detected in detections:
             is_new = True
             
             # Compare detected object with tracked ones

@@ -22,7 +22,7 @@ class YOLOV3(object):
         '''
         self.model_name = model_name
         config = {
-             "model_path": os.path.join(model_folder, model_name, 'yolo.h5'),
+             "model_path": os.path.join(model_folder, model_name, 'weights.h5'),
              "anchors_path": os.path.join(model_folder, model_name, 'anchors.txt'),
              "classes_path": os.path.join(model_folder, model_name, 'classes.txt')
             }
@@ -64,6 +64,11 @@ class YOLOV3(object):
             left = max(0, np.floor(left + 0.5).astype('int32'))
             bottom = min(image.size[1], np.floor(bottom + 0.5).astype('int32'))
             right = min(image.size[0], np.floor(right + 0.5).astype('int32'))
+            
+            assert top >= 0
+            assert left >= 0
+            assert bottom >= 0
+            assert right >= 0
             
             bbox = {}
             bbox['class'] = predicted_class
