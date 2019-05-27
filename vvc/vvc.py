@@ -143,7 +143,7 @@ class VVC(object):
 				tag = bbox['class']
 				
 				# Save annotations
-				if tag in filter_tags:
+				if tag in filter_tags and bbox['prob'] > 0.5:
 					object_data = frame_data.add_object()
 					object_data.tag = tag
 					object_data.box = bbox['box']
@@ -167,7 +167,9 @@ class VVC(object):
 				
 				if not show_obj_id:
 					label = label.split(sep=' ')[0]
-				
+					
+				#label += ' {0:.0%}'.format(object_data.probability)
+									
 				img_tracks = self.plot_box(img_tracks, box, color, label)
 			
 			# Save final image

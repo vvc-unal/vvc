@@ -40,8 +40,10 @@ class OtherTestCase(unittest.TestCase):
         tm_workers_folder = Path(config.base_folder).joinpath('Videos/TM/TrabajadoresYPolicias')
         video_filder = str(tm_workers_folder.joinpath('Videos'))
         output_folder = str(tm_workers_folder.joinpath('vvc'))
-        tm_workers_videos = ['Ch1_20181113075540_1min.mp4']
-        
+        tm_workers_videos = ['Ch1_20181113075540_1min.mp4', 'Ch2_20181110121206_1min.mp4',
+                             'Ch2_20181112171900_1min.mp4', 'Ch2_20181113171816_1min.mp4',
+                             'Ch3_20181115065141_1min.mp4', 'Ch4_20181117115137_1min.mp4',
+                             'Ch4_20181119065543_1min.mp4', 'Ch4_20181119164606_1min.mp4']
         
         config.video_folder = video_filder
         config.output_folder = output_folder
@@ -54,7 +56,7 @@ class OtherTestCase(unittest.TestCase):
             print(video_name)
             counter.count(video_name, 
                           frame_rate_factor=1, 
-                          filter_tags=['tu_llave', 'tm', 'seg'],
+                          filter_tags=['tu_llave', 'seg'],
                           show_obj_id=False)
     
     

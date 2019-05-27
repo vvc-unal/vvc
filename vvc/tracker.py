@@ -1,3 +1,4 @@
+from tensorflow.python.ops.gen_linalg_ops import self_adjoint_eig
 
 
 class NaiveTracker():
@@ -54,12 +55,13 @@ class NaiveTracker():
                     is_new = False
                     tracked.box = detected.box;
                     tracked.active = True
+                    tracked.probability = detected.probability
                     break
                 
             # If is new add to tracked objects
             if is_new:
                 name = self.getNextId(detected.tag)
-                tracked = TrackedObject(name, detected.tag, detected.box)
+                tracked = TrackedObject(name, detected.tag, detected.box, detected.probability)
                 
                 self.tracked_objects.append(tracked)
         
@@ -74,7 +76,7 @@ class TrackedObject:
     Class representing tracked objects
     '''
 
-    def __init__(self, name, tag, box):
+    def __init__(self, name, tag, box, probability):
         '''
         Constructor
         '''
@@ -82,6 +84,9 @@ class TrackedObject:
         self.tag = tag
         self.box = box
         self.active = True
+        self.probability = probability
 
     def deactivate(self):
         self.active = False
+        
+        
