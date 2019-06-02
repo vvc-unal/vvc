@@ -7,7 +7,7 @@ from tests.test_others import OtherTestCase
     
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(OtherTestCase('test_yolo_naive_tm_workers'))
+    suite.addTest(VVCTestCase('test_yolo_naive'))
     return suite
 
 if __name__ == '__main__':
