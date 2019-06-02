@@ -3,9 +3,9 @@ channels:
   - defaults
   - conda-forge
 dependencies:
+  - cudatoolkit=9
   - jupyter
   - matplotlib
-  - cudatoolkit=8
   - keras-gpu=2.1
   - pip
   - python=3.6
