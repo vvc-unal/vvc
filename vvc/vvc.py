@@ -12,7 +12,7 @@ from pathlib import Path
 
 from vvc import video_utils, json_utils
 from vvc import config as vvc_config
-from vvc.tracker import NaiveTracker
+from vvc.tracker.naive_tracker import NaiveTracker
 from vvc.video_data import VideoData
 
 class VVC(object):
@@ -188,6 +188,8 @@ class VVC(object):
 		
 		self.video_name = video_name
 		self.input_video_file = os.path.join(vvc_config.video_folder, video_name)
+		
+		self.tracker.__init__()
 		
 		video_name_no_suffix = Path(self.input_video_file).stem
 		
