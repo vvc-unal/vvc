@@ -8,7 +8,8 @@ from vvc.vvc import VVC
 
 class VVCTestCase(unittest.TestCase):
     
-    video_name = 'MOV_0861.mp4'
+    train_videos = ['MOV_0861.mp4', 'MOV_0841.mp4', 'MOV_0866.mp4', 'MOV_0872.mp4']
+    test_videos = ['CL 26 X CRA 33 600-610.mp4', 'CL 53 X CRA 60 910-911.mp4', 'CRA 7 X CL 45 955-959.mp4']
 
 
     def setUp(self):
@@ -18,20 +19,27 @@ class VVCTestCase(unittest.TestCase):
     def tearDown(self):
         pass
 
+    def counting(self, detector):
+        vvc = VVC(detector)
+        
+        for video_name in self.train_videos:
+            vvc.count(video_name, frame_rate_factor=0.1)
+            
+        for video_name in self.test_videos:
+            vvc.count(video_name)
 
     def test_faster_rcnn_naive(self):
         for model_name in config.models:
             if 'frcnn' in model_name:
                 detector = faster_rcnn.FasterRCNN(model_name)
-            
-                VVC(detector).count(self.video_name)
-        pass
+                self.counting(detector)
     
     def test_yolo_naive(self):
-        for model_name in config.models:
-            if 'YOLO' in model_name:
-                detector = yolo_v3.YOLOV3(model_name)
-            
-                VVC(detector).count(self.video_name)
-        pass
+        detector = yolo_v3.YOLOV3('YOLOv3')
+        self.counting(detector)
+        
+    def test_yolo_transfer_naive(self):
+        detector = yolo_v3.YOLOV3('YOLOv3-transfer')
+        self.counting(detector)
+                
     
