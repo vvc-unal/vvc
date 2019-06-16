@@ -2,8 +2,6 @@ from datetime import datetime
 import itertools
 import operator
 import os
-import shutil
-import sys
 
 import cv2
 import json
@@ -14,6 +12,7 @@ from vvc import video_utils, json_utils
 from vvc import config as vvc_config
 from vvc.tracker.naive_tracker import NaiveTracker
 from vvc.video_data import VideoData
+from vvc.video.skvideo_writer import SKVideoWriter
 
 class VVC(object):
 	
@@ -21,13 +20,6 @@ class VVC(object):
 		self.model_name = detector.model_name
 		self.obj_detector = detector
 		self.tracker = tracker
-		
-
-	def cleanup(self):
-		print("cleaning up...")
-		shutil.rmtree(self.output_img, ignore_errors=True)
-		
-		os.makedirs(self.output_img, exist_ok=True)
 	
 	def format_img_yolo(self, img, img_min_side):
 		(height, width, _) = img.shape
@@ -58,22 +50,22 @@ class VVC(object):
 		(x1, y1, x2, y2) = box
 				
 		cv2.rectangle(img_box, (x1, y1), (x2, y2), color, 2)
-		textLabel = label
+		text_label = label
 				
-		(retval, baseLine) = cv2.getTextSize(textLabel, cv2.FONT_HERSHEY_DUPLEX , 0.5, 1)
-		textOrg = (x1, y1)
+		(retval, base_line) = cv2.getTextSize(text_label, cv2.FONT_HERSHEY_DUPLEX , 0.5, 1)
+		text_org = (x1, y1)
 	
-		baseLine += 1
-		point1 = (textOrg[0] - 5, textOrg[1] + baseLine - 5)
-		point2 = (textOrg[0] + retval[0] + 5, textOrg[1] - retval[1] - 5)
+		base_line += 1
+		point1 = (text_org[0] - 5, text_org[1] + base_line - 5)
+		point2 = (text_org[0] + retval[0] + 5, text_org[1] - retval[1] - 5)
 	
 		cv2.rectangle(img_box, point1, point2, (0, 0, 0), 2)
 		cv2.rectangle(img_box, point1, point2, (255, 255, 255), -1)
-		cv2.putText(img_box, textLabel, textOrg, cv2.FONT_HERSHEY_DUPLEX , 0.5, (0, 0, 0), 1)
+		cv2.putText(img_box, text_label, text_org, cv2.FONT_HERSHEY_DUPLEX , 0.5, (0, 0, 0), 1)
 		
 		return img_box
 	
-	def main(self, filter_tags, show_obj_id):
+	def main(self, filter_tags, show_obj_id, frame_rate):
 		
 		data = VideoData()
 		data.video.input_file = self.input_video_file
@@ -88,6 +80,8 @@ class VVC(object):
 		print("anotating ...")
 	
 		reader = video_utils.video_reader(self.input_video_file)
+		
+		video_writer = SKVideoWriter(self.output_video_file, frame_rate)
 	
 		frame_id = 0
 		
@@ -168,21 +162,29 @@ class VVC(object):
 				if not show_obj_id:
 					label = label.split(sep=' ')[0]
 					
-				#label += ' {0:.0%}'.format(object_data.probability)
+					label += ' {0:.0%}'.format(object_data.probability)
 									
 				img_tracks = self.plot_box(img_tracks, box, color, label)
 			
 			# Save final image
-			img_scaled = img_tracks
-			cv2.imwrite(os.path.join(self.output_img, '{:05d}'.format(frame_id) + ".jpg"), img_scaled)
+			img_post = img_tracks
 			
+			img_post = cv2.cvtColor(img_post, cv2.COLOR_RGB2BGR)
+			
+			video_writer.writeFrame(img_post);
+						
 			frame_data.timestamps['postprocessing_end'] = datetime.now().isoformat()
+		
+			
+		video_writer.close()
 			
 		# Save data to json file
 		json_file = self.output_video_file + ".json"
 		json_utils.save_to_json(data, json_file)
 		
-	def count(self, video_name, frame_rate_factor=1, 
+	def count(self, 
+			video_name, 
+			frame_rate_factor=1, 
 			filter_tags=['bicycle', 'car', 'motorbike', 'bus', 'truck'], 
 			show_obj_id=True):
 		
@@ -195,19 +197,13 @@ class VVC(object):
 		
 		self.output_folder = os.path.join(vvc_config.output_folder, video_name_no_suffix)
 		self.output_video_file = os.path.join(self.output_folder, self.model_name + '.mp4')
-		self.output_img = os.path.join(self.output_folder, self.model_name)
-		
-		self.cleanup()
-		
+				
 		frame_rate = video_utils.get_avg_frame_rate(self.input_video_file)
 		
 		frame_rate = frame_rate * frame_rate_factor
 		
-		print("Main ...")
-		self.main(filter_tags=filter_tags, show_obj_id=show_obj_id)
-		
-		print("saving to video ..")
-		video_utils.save_to_video(self.output_img, self.output_video_file, frame_rate)
+		print("Counting ...")
+		self.main(filter_tags=filter_tags, show_obj_id=show_obj_id, frame_rate=frame_rate)
 		
 		print("Done..")
 		
