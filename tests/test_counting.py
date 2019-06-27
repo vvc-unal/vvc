@@ -41,5 +41,9 @@ class VVCTestCase(unittest.TestCase):
     def test_yolo_transfer_naive(self):
         detector = yolo_v3.YOLOV3('YOLOv3-transfer')
         self.counting(detector)
+        
+    def test_yolo_tiny_pretrained_naive(self):
+        detector = yolo_v3.YOLOV3('YOLOv3-tiny')
+        self.counting(detector)
                 
     

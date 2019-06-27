@@ -115,7 +115,7 @@ class VVC(object):
 			except:
 				pass
 			
-			# Resize image
+			# Resize input image
 			X = self.format_img_yolo(img, 600)
 	
 			if False: # Faster R-CNN

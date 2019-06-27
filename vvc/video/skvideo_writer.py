@@ -18,13 +18,13 @@ class SKVideoWriter(object):
         Constructor
         '''
         # start the FFmpeg writing subprocess with following parameters
-        inputparameters = {}
+        input_parameters = {'-r': str(frame_rate)}
         output_parameters = {'-vcodec': 'libx264',
                             '-pix_fmt': 'yuv420p', 
-                            "-r": str(frame_rate)}
+                            '-r': str(frame_rate)}
         
         self.writer = skvideo.io.FFmpegWriter(output_file,
-                                     inputdict = inputparameters,
+                                     inputdict = input_parameters,
                                      outputdict = output_parameters,
                                      verbosity=0)
         
