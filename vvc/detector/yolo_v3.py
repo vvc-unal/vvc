@@ -62,12 +62,12 @@ class YOLOV3(object):
             top, left, bottom, right = box
             top = max(0, np.floor(top + 0.5).astype('int32'))
             left = max(0, np.floor(left + 0.5).astype('int32'))
-            bottom = min(image.size[1], np.floor(bottom + 0.5).astype('int32'))
+            bottom = min(image.size[1], np.floor(max(bottom, 0) + 0.5).astype('int32'))
             right = min(image.size[0], np.floor(right + 0.5).astype('int32'))
             
             assert top >= 0
             assert left >= 0
-            assert bottom >= 0
+            assert bottom >= 0, "Box: {}, bottom{}".format(box, bottom)
             assert right >= 0
             
             bbox = {}
