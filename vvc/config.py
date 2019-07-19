@@ -11,4 +11,4 @@ model_folder = os.path.join(base_folder, 'Model')
 
 models = ['frcnn-resnet50', 'frcnn-resnet50-transfer',
           'YOLOv3', 'YOLOv3-transfer', 'YOLOv3-tiny', 'YOLOv3-tiny-transfer',
-          'vvc1-yolov3', 'vvc2-yolov3']
+          'vvc1-yolov3', 'vvc2-yolov3', 'vvc3-yolov3']
