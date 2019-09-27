@@ -14,6 +14,24 @@ from vvc.tracker.naive_tracker import NaiveTracker
 from vvc.video_data import VideoData
 from vvc.video.skvideo_writer import SKVideoWriter
 
+
+# import keras
+import keras
+
+# set tf backend to allow memory to grow, instead of claiming everything
+import tensorflow as tf
+
+def get_session():
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    return tf.Session(config=config)
+
+# use this environment flag to change which GPU to use
+#os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+
+# set the modified tf session as backend in keras
+keras.backend.tensorflow_backend.set_session(get_session())
+
 class VVC(object):
 	
 	def __init__(self, detector, tracker=NaiveTracker()):

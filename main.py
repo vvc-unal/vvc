@@ -14,4 +14,4 @@ if __name__ == '__main__':
     
     test_2_video = 'CL 53 X CRA 60 910-911'
             
-    VVC(detector).count( test_2_video + '.mp4', frame_rate_factor=1, show_obj_id=True)
+    VVC(detector).count( test_1_video + '.mp4', frame_rate_factor=0.2, show_obj_id=True)

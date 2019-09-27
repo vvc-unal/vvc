@@ -23,7 +23,7 @@ class VVCTestCase(unittest.TestCase):
         vvc = VVC(detector)
         
         for video_name in self.train_videos:
-            vvc.count(video_name, frame_rate_factor=0.1)
+            vvc.count(video_name, frame_rate_factor=0.2)
             
         for video_name in self.test_videos:
             vvc.count(video_name)
