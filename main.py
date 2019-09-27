@@ -1,12 +1,14 @@
 
-from vvc.detector import faster_rcnn,yolo_v3
+from vvc.detector import faster_rcnn,yolo_v3,retinanet
 from vvc.vvc import VVC
 
 if __name__ == '__main__':
     
-    detector = yolo_v3.YOLOV3('vvc3-yolov3')
+    #detector = yolo_v3.YOLOV3('vvc3-yolov3')
     
     #detector = faster_rcnn.FasterRCNN('frcnn-resnet50-tunned')
+    
+    detector = retinanet.RetinaNet('RetinaNet-ResNet50')
     
     test_1_video = 'MOV_0861'
     

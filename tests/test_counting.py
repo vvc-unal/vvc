@@ -3,7 +3,7 @@
 import unittest
 
 from vvc import config
-from vvc.detector import faster_rcnn, yolo_v3
+from vvc.detector import faster_rcnn, yolo_v3, retinanet
 from vvc.vvc import VVC
 
 class VVCTestCase(unittest.TestCase):
@@ -44,6 +44,10 @@ class VVCTestCase(unittest.TestCase):
         
     def test_yolo_tiny_pretrained_naive(self):
         detector = yolo_v3.YOLOV3('YOLOv3-tiny')
+        self.counting(detector)
+        
+    def test_retinanet_naive(self):
+        detector = retinanet.RetinaNet('RetinaNet-ResNet50')
         self.counting(detector)
                 
     
