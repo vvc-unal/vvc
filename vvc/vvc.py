@@ -8,10 +8,11 @@ import json
 import numpy as np
 from pathlib import Path
 
-from vvc import video_utils, json_utils
+from vvc import json_utils
 from vvc import config as vvc_config
 from vvc.tracker.naive_tracker import NaiveTracker
 from vvc.video_data import VideoData
+from vvc.video_utils import VideoWrapper
 from vvc.video.skvideo_writer import SKVideoWriter
 
 
@@ -21,10 +22,12 @@ import keras
 # set tf backend to allow memory to grow, instead of claiming everything
 import tensorflow as tf
 
+
+
 def get_session():
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    return tf.Session(config=config)
+	config = tf.ConfigProto()
+	config.gpu_options.allow_growth = True
+	return tf.Session(config=config)
 
 # use this environment flag to change which GPU to use
 #os.environ["CUDA_VISIBLE_DEVICES"] = "1"
@@ -97,7 +100,7 @@ class VVC(object):
 								
 		print("anotating ...")
 	
-		reader = video_utils.video_reader(self.input_video_file)
+		reader = self.input_video.video_reader()
 		
 		video_writer = SKVideoWriter(self.output_video_file, frame_rate)
 	
@@ -215,8 +218,10 @@ class VVC(object):
 		
 		self.output_folder = os.path.join(vvc_config.output_folder, video_name_no_suffix)
 		self.output_video_file = os.path.join(self.output_folder, self.model_name + '.mp4')
+		
+		self.input_video = VideoWrapper(self.input_video_file)
 				
-		frame_rate = video_utils.get_avg_frame_rate(self.input_video_file)
+		frame_rate = self.input_video.avg_frame_rate()
 		
 		frame_rate = frame_rate * frame_rate_factor
 		

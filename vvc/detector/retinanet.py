@@ -1,17 +1,11 @@
 '''
 '''
-import os
 from pathlib import Path
 
-from keras import backend as K
 import numpy as np
-from PIL import Image
 
-# import keras_retinanet
 from keras_retinanet import models
-from keras_retinanet.utils.image import read_image_bgr, preprocess_image, resize_image
-from keras_retinanet.utils.visualization import draw_box, draw_caption
-from keras_retinanet.utils.colors import label_color
+from keras_retinanet.utils.image import preprocess_image, resize_image
 
 from vvc.config import model_folder
 
@@ -41,7 +35,6 @@ class RetinaNet(object):
         # preprocess image for network
         image = preprocess_image(frame)
         image, scale = resize_image(image)
-        #image = Image.fromarray(frame)
         
         # process image
         boxes, scores, labels = self.model.predict_on_batch(np.expand_dims(image, axis=0))
