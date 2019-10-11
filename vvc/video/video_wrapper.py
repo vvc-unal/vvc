@@ -62,4 +62,4 @@ class VideoWrapper(object):
         
         logger.info('total frames: %s', total_frames)
         
-        return total_frames
+        return int(total_frames)

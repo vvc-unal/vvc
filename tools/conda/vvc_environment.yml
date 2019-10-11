@@ -5,15 +5,16 @@ channels:
 dependencies:
   - cudatoolkit=9
   - jupyter
-  - matplotlib
   - keras-gpu=2.1
+  - matplotlib
   - pandas
   - pip
   - python=3.6
+  - tqdm
   - pip:
+    - ffmpeg-python~=0.1
+	- glances
     - jsonpickle
+	- nvidia-ml-py3
     - opencv-python~=3.4
     - scikit-video~=1.1
-    - glances
-    - nvidia-ml-py3
-    - ffmpeg-python~=0.1

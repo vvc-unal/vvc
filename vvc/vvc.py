@@ -7,6 +7,7 @@ import cv2
 import json
 import numpy as np
 from pathlib import Path
+from tqdm import tqdm
 
 from vvc import json_utils
 from vvc import config as vvc_config
@@ -105,98 +106,105 @@ class VVC(object):
 		video_writer = SKVideoWriter(self.output_video_file, frame_rate)
 	
 		frame_id = 0
+		total_frames = self.input_video.total_frames()
 		
 		class_mapping = self.obj_detector.get_class_mapping()
 			
 		class_to_color = {class_mapping[v]: np.random.randint(0, 255, 3).tolist() for v in class_mapping}
-	
-		for frame in reader:
-			
-			frame_id += 1
-			img_name = str(frame_id) + ".jpg"
-			
-			# Save frame data
-			frame_data = data.add_frame_data()
-			frame_data.name = img_name
-			frame_data.timestamps['start'] = datetime.now().isoformat()
-			
-			# Image preprocesing
-			img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-			
-			# Plot ignore box
-			try:
-				vott_frame = vott['frames'][str(frame_id)]
-				ignore_tags = list(filter(lambda x: 'ignore' in x['tags'], vott_frame))
-				if len(ignore_tags) > 0:
-					box = ignore_tags[0]['box']
-					ignore_box = np.array([box['x1'], box['y1'], box['x2'], box['y2']]).astype(int)
-					(x1, y1, x2, y2) = ignore_box
-					color = [0, 0, 0]
-					cv2.rectangle(img, (x1, y1), (x2, y2), color, -1)
-			except:
-				pass
-			
-			# Resize input image
-			X = self.format_img_yolo(img, 600)
-	
-			if False: # Faster R-CNN
-				img_scaled = np.transpose(X.copy()[0, (2, 1, 0), :, :], (1, 2, 0)).copy()
-				img_scaled[:, :, 0] += 123.68
-				img_scaled[:, :, 1] += 116.779
-				img_scaled[:, :, 2] += 103.939
-	
-				img_scaled = img_scaled.astype(np.uint8)
-			else:
-				img_scaled = X.astype(np.uint8)
-			
-			frame_data.timestamps['preprocessing_end'] = datetime.now().isoformat()
-			
-			bboxes = self.obj_detector.predict(X)
-					
-			for bbox in bboxes:
-				
-				tag = bbox['class']
-				
-				# Save annotations
-				if tag in filter_tags and bbox['prob'] > 0.5:
-					object_data = frame_data.add_object()
-					object_data.tag = tag
-					object_data.box = bbox['box']
-					object_data.probability = bbox['prob']
-			
-			frame_data.timestamps['detection_end'] = datetime.now().isoformat()
-			
-			# Tracking the objects
-			tracked_objects = self.tracker.tracking(frame_data.objects)
-			
-			frame_data.timestamps['tracking_end'] = datetime.now().isoformat()
-			
-			# Plot tracking results
-			img_tracks = img_scaled.copy()
-			
-			for object_data in tracked_objects:
-				
-				box = object_data.box
-				color = class_to_color[object_data.tag]
-				label = '{}'.format(object_data.name)
-				
-				if not show_obj_id:
-					label = label.split(sep=' ')[0]
-					
-					label += ' {0:.0%}'.format(object_data.probability)
-									
-				img_tracks = self.plot_box(img_tracks, box, color, label)
-			
-			# Save final image
-			img_post = img_tracks
-			
-			img_post = cv2.cvtColor(img_post, cv2.COLOR_RGB2BGR)
-			
-			video_writer.writeFrame(img_post);
-						
-			frame_data.timestamps['postprocessing_end'] = datetime.now().isoformat()
 		
+		with tqdm(total=total_frames, unit='frames') as pbar:
+		
+			for frame in reader:
+				
+				frame_id += 1
+				img_name = str(frame_id) + ".jpg"
+				
+				tqdm_step = int(total_frames / 10)
+				if frame_id % tqdm_step == 0:
+					pbar.update(tqdm_step)
+				
+				# Save frame data
+				frame_data = data.add_frame_data()
+				frame_data.name = img_name
+				frame_data.timestamps['start'] = datetime.now().isoformat()
+				
+				# Image preprocesing
+				img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+				
+				# Plot ignore box
+				try:
+					vott_frame = vott['frames'][str(frame_id)]
+					ignore_tags = list(filter(lambda x: 'ignore' in x['tags'], vott_frame))
+					if len(ignore_tags) > 0:
+						box = ignore_tags[0]['box']
+						ignore_box = np.array([box['x1'], box['y1'], box['x2'], box['y2']]).astype(int)
+						(x1, y1, x2, y2) = ignore_box
+						color = [0, 0, 0]
+						cv2.rectangle(img, (x1, y1), (x2, y2), color, -1)
+				except:
+					pass
+				
+				# Resize input image
+				X = self.format_img_yolo(img, 600)
+		
+				if False: # Faster R-CNN
+					img_scaled = np.transpose(X.copy()[0, (2, 1, 0), :, :], (1, 2, 0)).copy()
+					img_scaled[:, :, 0] += 123.68
+					img_scaled[:, :, 1] += 116.779
+					img_scaled[:, :, 2] += 103.939
+		
+					img_scaled = img_scaled.astype(np.uint8)
+				else:
+					img_scaled = X.astype(np.uint8)
+				
+				frame_data.timestamps['preprocessing_end'] = datetime.now().isoformat()
+				
+				bboxes = self.obj_detector.predict(X)
+						
+				for bbox in bboxes:
+					
+					tag = bbox['class']
+					
+					# Save annotations
+					if tag in filter_tags and bbox['prob'] > 0.5:
+						object_data = frame_data.add_object()
+						object_data.tag = tag
+						object_data.box = bbox['box']
+						object_data.probability = bbox['prob']
+				
+				frame_data.timestamps['detection_end'] = datetime.now().isoformat()
+				
+				# Tracking the objects
+				tracked_objects = self.tracker.tracking(frame_data.objects)
+				
+				frame_data.timestamps['tracking_end'] = datetime.now().isoformat()
+				
+				# Plot tracking results
+				img_tracks = img_scaled.copy()
+				
+				for object_data in tracked_objects:
+					
+					box = object_data.box
+					color = class_to_color[object_data.tag]
+					label = '{}'.format(object_data.name)
+					
+					if not show_obj_id:
+						label = label.split(sep=' ')[0]
+						
+						label += ' {0:.0%}'.format(object_data.probability)
+										
+					img_tracks = self.plot_box(img_tracks, box, color, label)
+				
+				# Save final image
+				img_post = img_tracks
+				
+				img_post = cv2.cvtColor(img_post, cv2.COLOR_RGB2BGR)
+				
+				video_writer.writeFrame(img_post);
+							
+				frame_data.timestamps['postprocessing_end'] = datetime.now().isoformat()
 			
+				
 		video_writer.close()
 			
 		# Save data to json file
