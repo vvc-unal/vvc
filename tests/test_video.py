@@ -1,7 +1,7 @@
 import unittest
 
 import os
-from vvc.video_utils import VideoWrapper
+from vvc.video.video_wrapper import VideoWrapper
 
 base_folder = os.path.join(os.environ['HOME'], 'workspace/Maestria/')
 video_folder = os.path.join(base_folder, 'Videos/')

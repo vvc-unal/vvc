@@ -49,7 +49,7 @@ class VideoWrapper(object):
         a, b = metadata['video']['@avg_frame_rate'].split('/')
         avg_frame_rate = float(a) / float(b);
         
-        logger.info('avg_frame_rate: %s', avg_frame_rate)
+        logger.info('avg frame rate: %s', avg_frame_rate)
         
         return avg_frame_rate
        
@@ -60,6 +60,6 @@ class VideoWrapper(object):
         
         total_frames = metadata['video']['@nb_frames']
         
-        logger.info('total_frames: %s', total_frames)
+        logger.info('total frames: %s', total_frames)
         
         return total_frames

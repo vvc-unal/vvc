@@ -12,8 +12,8 @@ from vvc import json_utils
 from vvc import config as vvc_config
 from vvc.tracker.naive_tracker import NaiveTracker
 from vvc.video_data import VideoData
-from vvc.video_utils import VideoWrapper
 from vvc.video.skvideo_writer import SKVideoWriter
+from vvc.video.video_wrapper import VideoWrapper
 
 
 # import keras
