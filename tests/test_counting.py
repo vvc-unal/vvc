@@ -9,7 +9,7 @@ from vvc.vvc import VVC
 class VVCTestCase(unittest.TestCase):
     
     train_videos = ['MOV_0861.mp4', 'MOV_0841.mp4', 'MOV_0866.mp4', 'MOV_0872.mp4']
-    test_videos = ['CL 26 X CRA 33 600-610.mp4', 'CL 53 X CRA 60 910-911.mp4', 'CRA 7 X CL 45 955-959.mp4']
+    test_videos = ['CL 53 X CRA 60 910-911.mp4', 'CL 26 X CRA 33 600-610.mp4', 'CRA 7 X CL 45 955-959.mp4']
 
 
     def setUp(self):
@@ -23,10 +23,12 @@ class VVCTestCase(unittest.TestCase):
         vvc = VVC(detector)
         
         for video_name in self.train_videos:
-            vvc.count(video_name, frame_rate_factor=0.2)
+            vvc.count(video_name, frame_rate_factor=0.5)
+            break
             
         for video_name in self.test_videos:
             vvc.count(video_name)
+            break
 
     def test_faster_rcnn_naive(self):
         for model_name in config.models:

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import itertools
 import operator
 import os
@@ -17,11 +17,12 @@ from vvc.video.skvideo_writer import SKVideoWriter
 from vvc.video.video_wrapper import VideoWrapper
 
 
-# import keras
+# keras
 import keras
 
 # set tf backend to allow memory to grow, instead of claiming everything
 import tensorflow as tf
+import logging
 
 
 
@@ -35,6 +36,13 @@ def get_session():
 
 # set the modified tf session as backend in keras
 keras.backend.tensorflow_backend.set_session(get_session())
+
+def miliseconds_from(last_time):
+	now = datetime.now()
+	diff = (now - last_time) / timedelta(microseconds=1) / 1000
+	return diff, now
+	
+
 
 class VVC(object):
 	
@@ -87,17 +95,14 @@ class VVC(object):
 		
 		return img_box
 	
+	
+	
 	def main(self, filter_tags, show_obj_id, frame_rate):
 		
 		data = VideoData()
+		data.timestamps['start'] = datetime.now().isoformat()
 		data.video.input_file = self.input_video_file
 		data.video.output_file = self.output_video_file
-		
-		# vott file
-		vott_file_path = Path(self.input_video_file + '.json')
-		if vott_file_path.exists():
-			with vott_file_path.open() as json_data:
-				vott = json.load(json_data)
 								
 		print("anotating ...")
 	
@@ -112,7 +117,11 @@ class VVC(object):
 			
 		class_to_color = {class_mapping[v]: np.random.randint(0, 255, 3).tolist() for v in class_mapping}
 		
-		with tqdm(total=total_frames, unit='frames') as pbar:
+		data.timestamps['warm'] = datetime.now().isoformat()
+		
+		last_time = datetime.now()
+			
+		with tqdm(total=total_frames, unit='frame') as pbar:
 		
 			for frame in reader:
 				
@@ -126,38 +135,19 @@ class VVC(object):
 				# Save frame data
 				frame_data = data.add_frame_data()
 				frame_data.name = img_name
-				frame_data.timestamps['start'] = datetime.now().isoformat()
+				frame_data.timestamps['read'], last_time = miliseconds_from(last_time)
 				
 				# Image preprocesing
 				img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 				
-				# Plot ignore box
-				try:
-					vott_frame = vott['frames'][str(frame_id)]
-					ignore_tags = list(filter(lambda x: 'ignore' in x['tags'], vott_frame))
-					if len(ignore_tags) > 0:
-						box = ignore_tags[0]['box']
-						ignore_box = np.array([box['x1'], box['y1'], box['x2'], box['y2']]).astype(int)
-						(x1, y1, x2, y2) = ignore_box
-						color = [0, 0, 0]
-						cv2.rectangle(img, (x1, y1), (x2, y2), color, -1)
-				except:
-					pass
-				
 				# Resize input image
 				X = self.format_img_yolo(img, 600)
 		
-				if False: # Faster R-CNN
-					img_scaled = np.transpose(X.copy()[0, (2, 1, 0), :, :], (1, 2, 0)).copy()
-					img_scaled[:, :, 0] += 123.68
-					img_scaled[:, :, 1] += 116.779
-					img_scaled[:, :, 2] += 103.939
-		
-					img_scaled = img_scaled.astype(np.uint8)
-				else:
-					img_scaled = X.astype(np.uint8)
+				img_scaled = X.astype(np.uint8)
 				
-				frame_data.timestamps['preprocessing_end'] = datetime.now().isoformat()
+				frame_data.timestamps['preprocessing'], last_time = miliseconds_from(last_time)
+				
+				# Objetct detection
 				
 				bboxes = self.obj_detector.predict(X)
 						
@@ -172,12 +162,12 @@ class VVC(object):
 						object_data.box = bbox['box']
 						object_data.probability = bbox['prob']
 				
-				frame_data.timestamps['detection_end'] = datetime.now().isoformat()
+				frame_data.timestamps['detection'], last_time = miliseconds_from(last_time)
 				
 				# Tracking the objects
 				tracked_objects = self.tracker.tracking(frame_data.objects)
 				
-				frame_data.timestamps['tracking_end'] = datetime.now().isoformat()
+				frame_data.timestamps['tracking'], last_time = miliseconds_from(last_time)
 				
 				# Plot tracking results
 				img_tracks = img_scaled.copy()
@@ -202,15 +192,19 @@ class VVC(object):
 				
 				video_writer.writeFrame(img_post);
 							
-				frame_data.timestamps['postprocessing_end'] = datetime.now().isoformat()
+				frame_data.timestamps['postprocessing'], last_time = miliseconds_from(last_time)
 			
-				
+		
+		data.timestamps['end_loop'] = datetime.now().isoformat()
+		
 		video_writer.close()
-			
+		
+		data.timestamps['write'] = datetime.now().isoformat()	
+		
 		# Save data to json file
 		json_file = self.output_video_file + ".json"
 		json_utils.save_to_json(data, json_file)
-		
+				
 	def count(self, 
 			video_name, 
 			frame_rate_factor=1, 

@@ -9,6 +9,7 @@ class VideoData(object):
         '''
         Constructor
         '''
+        self.timestamps = {}
         self.video = Video()
         self.frames = {}
         
