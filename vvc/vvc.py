@@ -4,7 +4,6 @@ import operator
 import os
 
 import cv2
-import json
 import numpy as np
 from pathlib import Path
 from tqdm import tqdm
@@ -20,13 +19,13 @@ from vvc.video.video_wrapper import VideoWrapper
 # keras
 import keras
 
-# set tf backend to allow memory to grow, instead of claiming everything
 import tensorflow as tf
 import logging
 
 
 
 def get_session():
+	''' Set tf backend to allow memory to grow, instead of claiming everything '''
 	config = tf.ConfigProto()
 	config.gpu_options.allow_growth = True
 	return tf.Session(config=config)
@@ -36,6 +35,7 @@ def get_session():
 
 # set the modified tf session as backend in keras
 keras.backend.tensorflow_backend.set_session(get_session())
+
 
 def miliseconds_from(last_time):
 	now = datetime.now()
@@ -103,9 +103,7 @@ class VVC(object):
 		data.timestamps['start'] = datetime.now().isoformat()
 		data.video.input_file = self.input_video_file
 		data.video.output_file = self.output_video_file
-								
-		print("anotating ...")
-	
+									
 		reader = self.input_video.video_reader()
 		
 		video_writer = SKVideoWriter(self.output_video_file, frame_rate)

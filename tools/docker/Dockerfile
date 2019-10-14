@@ -4,7 +4,7 @@ FROM tensorflow/tensorflow:1.4.1-gpu-py3
 LABEL maintainer="jsnavarroa@unal.edu.co"
 
 
-# The code below is all based on the repos:
+# The code below is based on the repos:
 #   https://github.com/janza/docker-python3-opencv
 #   https://github.com/fbcotter/docker-tensorflow-opencv
 

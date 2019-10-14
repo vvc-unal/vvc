@@ -4,8 +4,9 @@ channels:
   - conda-forge
 dependencies:
   - cudatoolkit=9
-  - jupyter
   - keras-gpu=2.1
+  - jupyter
+  #- nomkl # For AMD Ryzen CPUs, prefer no MKL
   - matplotlib
   - pandas
   - pip
@@ -13,8 +14,8 @@ dependencies:
   - tqdm
   - pip:
     - ffmpeg-python~=0.1
-	- glances
+    - glances
     - jsonpickle
-	- nvidia-ml-py3
+    - nvidia-ml-py3
     - opencv-python~=3.4
     - scikit-video~=1.1

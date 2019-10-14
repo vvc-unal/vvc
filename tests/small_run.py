@@ -11,6 +11,8 @@ def suite():
     suite.addTest(VVCTestCase('test_yolo_naive'))
     suite.addTest(VVCTestCase('test_yolo_transfer_naive'))
     suite.addTest(VVCTestCase('test_yolo_tiny_pretrained_naive'))
+    suite.addTest(VVCTestCase('test_vvc_naive'))
+    suite.addTest(VVCTestCase('test_retinanet_naive'))
     return suite
 
 if __name__ == '__main__':
