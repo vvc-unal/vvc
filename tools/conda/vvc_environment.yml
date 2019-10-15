@@ -6,7 +6,7 @@ dependencies:
   - cudatoolkit=9
   - keras-gpu=2.1
   - jupyter
-  #- nomkl # For AMD Ryzen CPUs, prefer no MKL
+  - nomkl # The processing will be done by the GPU
   - matplotlib
   - pandas
   - pip
@@ -19,3 +19,4 @@ dependencies:
     - nvidia-ml-py3
     - opencv-python~=3.4
     - scikit-video~=1.1
+    - tensorflow_model_optimization
