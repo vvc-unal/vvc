@@ -23,6 +23,8 @@ basic_models = [__frcnn, __frcnn_transfer,
                 __tiny_yolo3, __tiny_yolo3_transfer,
                 __retinanet]
 
+vvc_models = [__vvc1, __vvc2, __vvc3]
+
 def __init__(self, params):
     '''
     Constructor
