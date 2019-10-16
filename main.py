@@ -1,17 +1,13 @@
 import logging
 
-from vvc.detector import faster_rcnn,yolo_v3,retinanet
+from vvc.detector.object_detection import get_detector, Model
 from vvc.vvc import VVC
 
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 
 if __name__ == '__main__':
     
-    #detector = yolo_v3.YOLOV3('vvc3-yolov3')
-    
-    #detector = faster_rcnn.FasterRCNN('frcnn-resnet50-tunned')
-    
-    detector = retinanet.RetinaNet('RetinaNet-ResNet50')
+    detector = get_detector(Model.RETINANET)
     
     test_1_video = 'MOV_0861'
     

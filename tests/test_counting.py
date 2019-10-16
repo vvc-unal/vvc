@@ -3,10 +3,8 @@
 import logging
 import unittest
 
-from vvc import config
-from vvc.detector import faster_rcnn, yolo_v3, retinanet
+from vvc.detector import object_detection, yolo_v3, retinanet
 from vvc.vvc import VVC
-
 
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 
@@ -27,20 +25,20 @@ class VVCTestCase(unittest.TestCase):
     def counting(self, detector):
         vvc = VVC(detector)
         
-        '''for video_name in self.train_videos:
+        for video_name in self.train_videos:
             vvc.count(video_name, frame_rate_factor=0.5)
-            break'''
-            
-        for video_name in self.test_videos:
-            vvc.count(video_name)
             break
+            
+        '''for video_name in self.test_videos:
+            vvc.count(video_name)
+            break'''
 
     def test_faster_rcnn_naive(self):
         logging.info('faster_rcnn')
-        for model_name in config.models:
-            if 'frcnn' in model_name:
-                detector = faster_rcnn.FasterRCNN(model_name)
-                self.counting(detector)
+        for model in object_detection.frcnn_models:
+            logging.info(model.value)
+            detector = object_detection.get_detector(model)
+            self.counting(detector)
     
     def test_yolo_naive(self):
         logging.info('yolo v3')
