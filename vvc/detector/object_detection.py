@@ -5,16 +5,17 @@ from enum import Enum
 from vvc.detector import faster_rcnn, yolo_v3, retinanet
 
 class Model(Enum):
-    FRCNN = 'FRCNN-resnet50'
-    FRCNN_TRANSFER = 'FRCNN-resnet50-transfer'
+    FRCNN = 'frcnn-resnet50'
+    FRCNN_TRANSFER = 'frcnn-resnet50-transfer'
     RETINANET = 'RetinaNet-ResNet50'
     YOLO3 = 'YOLOv3'
     YOLO3_TRANSFER = 'YOLOv3-transfer'
+    YOLO3_PRUNNED = 'yolo3-prunned'
     TINY_YOLO3 = 'YOLOv3-tiny'
     TINY_YOLO3_TRANSFER = 'YOLOv3-tiny-transfer'
-    VVC1 = 'VVC1-yolov3'
-    VVC2 = 'VVC2-yolov3'
-    VVC3 = 'VVC3-yolov3'
+    VVC1 = 'vvc1-yolov3'
+    VVC2 = 'vvc2-yolov3'
+    VVC3 = 'vvc3-yolov3'
 
 
 all_models = [Model.FRCNN, Model.FRCNN_TRANSFER,
@@ -24,13 +25,13 @@ all_models = [Model.FRCNN, Model.FRCNN_TRANSFER,
           Model.RETINANET]
 
 basic_models = [Model.FRCNN, Model.FRCNN_TRANSFER, 
-                Model.YOLO3, Model.YOLO3_TRANSFER, 
+                Model.YOLO3, Model.YOLO3_TRANSFER, Model.YOLO3_PRUNNED,
                 Model.TINY_YOLO3, Model.TINY_YOLO3_TRANSFER,
                 Model.RETINANET]
 
 frcnn_models = [Model.FRCNN, Model.FRCNN_TRANSFER]
 
-yolo3_models = [Model.YOLO3, Model.YOLO3_TRANSFER]
+yolo3_models = [Model.YOLO3, Model.YOLO3_TRANSFER, Model.YOLO3_PRUNNED]
 
 tiny_yolo3_models = [Model.TINY_YOLO3, Model.TINY_YOLO3_TRANSFER]
 
