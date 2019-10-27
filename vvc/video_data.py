@@ -36,11 +36,17 @@ class FrameData(object):
         self.name = ""
         self.objects = []
         self.timestamps = {}
+        self.tracks = []
     
     def add_object(self):
         obj = ObjectData()
         self.objects.append(obj)
         return obj
+    
+    def add_track(self):
+        track = TrackData()
+        self.tracks.append(track)
+        return track
 
     
 class ObjectData(object):
@@ -52,4 +58,12 @@ class ObjectData(object):
         self.tag = None
         self.box = None
         self.probability = None
+        
+class TrackData(object):
+    def __init__(self):
+        '''
+        Constructor
+        '''
+        self.id = None
+        self.box = None
     

@@ -158,7 +158,7 @@ class VVC(object):
 						object_data = frame_data.add_object()
 						object_data.tag = tag
 						object_data.box = bbox['box']
-						object_data.probability = bbox['prob']
+						object_data.probability = float(bbox['prob'])
 				
 				frame_data.timestamps['detection'], last_time = miliseconds_from(last_time)
 				
@@ -166,7 +166,7 @@ class VVC(object):
 				tracked_objects = self.tracker.tracking(frame_data.objects)
 				
 				frame_data.timestamps['tracking'], last_time = miliseconds_from(last_time)
-				
+								
 				# Plot tracking results
 				img_tracks = img_scaled.copy()
 				
@@ -175,6 +175,10 @@ class VVC(object):
 					box = object_data.box
 					color = class_to_color[object_data.tag]
 					label = '{}'.format(object_data.name)
+					
+					track_data = frame_data.add_track()
+					track_data.id = object_data.name
+					track_data.box = box
 					
 					if not show_obj_id:
 						label = label.split(sep=' ')[0]
