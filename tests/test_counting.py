@@ -29,9 +29,9 @@ class VVCTestCase(unittest.TestCase):
             vvc.count(video_name, frame_rate_factor=0.5)
             break
             
-        '''for video_name in self.test_videos:
+        for video_name in self.test_videos:
             vvc.count(video_name)
-            break'''
+            break
 
     def test_faster_rcnn_naive(self):
         logging.info('faster_rcnn')

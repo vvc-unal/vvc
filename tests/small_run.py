@@ -4,10 +4,11 @@ import unittest
 
 from tests.test_counting import VVCTestCase
 from tests.test_others import OtherTestCase
+from tests.test_mot_metrics import MOTMetricsTestCase
     
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(VVCTestCase('test_retinanet_naive'))
+    suite.addTest(MOTMetricsTestCase('test_motchallenge_files'))
     return suite
 
 if __name__ == '__main__':

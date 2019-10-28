@@ -7,7 +7,7 @@ logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 
 if __name__ == '__main__':
     
-    detector = get_detector(Model.YOLO3_PRUNNED)
+    detector = get_detector(Model.TINY_YOLO3)
     
     test_1_video = 'MOV_0861'
     
