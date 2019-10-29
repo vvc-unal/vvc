@@ -1,10 +1,9 @@
 '''
 '''
 import logging
+import os
 
 import motmetrics as mm
-import numpy as np
-import pandas as pd
 from pathlib import Path
 import unittest
 
@@ -71,13 +70,14 @@ class MOTMetricsTestCase(unittest.TestCase):
             mot_challenge_folder.mkdir(exist_ok = True)
             
             # Select files
-        
-            file_name = Model.TINY_YOLO3.value
             
-            vvc_file = vvc_folder.joinpath(file_name + '.mp4.json')
-            mot_challenge_file = mot_challenge_folder.joinpath(file_name + '.txt')
-            
-            assert vvc_file.exists() 
+            for model in [Model.TINY_YOLO3, Model.RETINANET]:
+                file_name = model.value
+                
+                vvc_file = vvc_folder.joinpath(file_name + '.mp4.json')
+                mot_challenge_file = mot_challenge_folder.joinpath(file_name + '.txt')
+                
+                assert vvc_file.exists() 
             
             # Transform
             
@@ -90,8 +90,31 @@ class MOTMetricsTestCase(unittest.TestCase):
             assert mot_challenge_file.exists()
     
     def test_motchallenge_files(self):
+        
+        mot_challenge_folder = Path(config.video_folder).joinpath('mot_challenge')
+        
+        vvc_folder = Path(config.output_folder).joinpath(self.test_video).joinpath('mot_challenge')
+        
+        dnames = [
+            'RetinaNet-ResNet50',
+            'YOLOv3-tiny',
+        ]
+        
+        def compute_motchallenge(dname):
+            df_gt = mm.io.loadtxt(os.path.join(mot_challenge_folder, self.test_video + '.txt'))
+            df_test = mm.io.loadtxt(os.path.join(vvc_folder, dname + '.txt'))
+            return mm.utils.compare_to_groundtruth(df_gt, df_test, 'iou', distth=0.5)
+    
+        accs = [compute_motchallenge(d) for d in dnames]
+    
+        # For testing
+        #[a.events.to_pickle(n) for (a,n) in zip(accs, dnames)]
+    
         mh = mm.metrics.create()
-        print(mh.list_metrics_markdown())
+        summary = mh.compute_many(accs, metrics=mm.metrics.motchallenge_metrics, names=dnames, generate_overall=False)
+    
+        print()
+        print(mm.io.render_summary(summary, namemap=mm.io.motchallenge_metric_names, formatters=mh.formatters))
     
     
     

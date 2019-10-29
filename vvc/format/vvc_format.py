@@ -19,10 +19,7 @@ def to_mot_challenge(vvc_file, mot_challenge_file):
     for frame_id, frame_data in video_data.frames.items():
         for track_data in frame_data.tracks:
             
-            if not track_data.id in ids:
-                ids[track_data.id] = len(ids)
-            
-            track_id = ids[track_data.id]
+            track_id = track_data.id
             
             box = track_data.box
             bb_left = box[0]
@@ -33,6 +30,17 @@ def to_mot_challenge(vvc_file, mot_challenge_file):
             row_df = pd.DataFrame([[frame_id, track_id, bb_left, bb_top, bb_width, bb_height]], 
                                           columns=main_columns)
             df = df.append(row_df, ignore_index = True, sort=False)
+            
+    df = df.sort_values(by=['frame', 'bb_left'])
+    
+    for index, row in df.iterrows():
+        t_id = row['id']
+        if not t_id in ids:
+            ids[t_id] = len(ids)
+        
+        track_id = ids[t_id]
+        
+        df.loc[index, 'id'] = track_id
     
     # Process data frame
     

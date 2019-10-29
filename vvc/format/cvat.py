@@ -5,8 +5,14 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 
 def to_mot_challenge(cvat_file, mot_challenge_file):
-    df = pd.DataFrame(columns=['frame', 'id', 'bb_left', 'bb_top', 'bb_width', 'bb_height', 'conf', 'x', 'y', 'z'])
+    ids = dict()
+    mot_columns = ['frame', 'id', 'bb_left', 'bb_top', 'bb_width', 'bb_height']
+    
+    mot = pd.DataFrame(columns=mot_columns + ['conf', 'x', 'y', 'z'])
+    
     tree=ET.parse(cvat_file)
+    
+    
     
     # Consume cvat file
     annotations = tree.getroot() 
@@ -24,15 +30,27 @@ def to_mot_challenge(cvat_file, mot_challenge_file):
                 ybr = float(box.get('ybr'))
                                 
                 row_df = pd.DataFrame([[frame_id, track_id, xtl, ytl, xbr - xtl, ybr - ytl]], 
-                                      columns=['frame', 'id', 'bb_left', 'bb_top', 'bb_width', 'bb_height'])
-                df = df.append(row_df, ignore_index = True, sort=False)
+                                      columns=mot_columns)
+                mot = mot.append(row_df, ignore_index=True, sort=False)
+                
+    mot = mot.sort_values(by=['frame', 'bb_left'])
+    
+    for index, row in mot.iterrows():
+        t_id = row['id']
+        if not t_id in ids:
+            ids[t_id] = len(ids)
+        
+        track_id = ids[t_id]
+        
+        mot.loc[index, 'id'] = track_id
     
     # Process data frame
     
-    df[['conf', 'x', 'y', 'z']] = -1
+    mot[['conf', 'x', 'y', 'z']] = -1
     
-    df = df.sort_values(by=['frame'])
+    mot = mot.sort_values(by=['frame'])
     
-    df.to_csv(mot_challenge_file, float_format='%.3f', header=False, index=False)
+    mot.to_csv(mot_challenge_file, float_format='%.3f', header=False, index=False)
     
-    return df
+    return mot
+

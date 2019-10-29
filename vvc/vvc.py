@@ -65,7 +65,7 @@ class VVC(object):
 		
 		img = cv2.resize(img, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
 		
-		return img
+		return img, f
 	
 	def accumulate(self, l):
 		it = itertools.groupby(l, operator.itemgetter(0))
@@ -139,7 +139,7 @@ class VVC(object):
 				img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 				
 				# Resize input image
-				X = self.format_img_yolo(img, 600)
+				X, scale_factor = self.format_img_yolo(img, 600)
 		
 				img_scaled = X.astype(np.uint8)
 				
@@ -168,7 +168,6 @@ class VVC(object):
 				frame_data.timestamps['tracking'], last_time = miliseconds_from(last_time)
 								
 				# Plot tracking results
-				img_tracks = img_scaled.copy()
 				
 				for object_data in tracked_objects:
 					
@@ -178,14 +177,14 @@ class VVC(object):
 					
 					track_data = frame_data.add_track()
 					track_data.id = object_data.name
-					track_data.box = box
+					track_data.box = np.array(box) * (1/scale_factor)
 					
 					if not show_obj_id:
 						label = label.split(sep=' ')[0]
 						
 						label += ' {0:.0%}'.format(object_data.probability)
 										
-					img_tracks = self.plot_box(img_tracks, box, color, label)
+					img_tracks = self.plot_box(img_scaled, box, color, label)
 				
 				# Save final image
 				img_post = img_tracks

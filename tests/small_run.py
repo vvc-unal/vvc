@@ -8,6 +8,8 @@ from tests.test_mot_metrics import MOTMetricsTestCase
     
 def suite():
     suite = unittest.TestSuite()
+    #suite.addTest(MOTMetricsTestCase('test_cvat_to_motchallenge_ground_truth'))
+    suite.addTest(MOTMetricsTestCase('test_vvc_to_motchallenge'))
     suite.addTest(MOTMetricsTestCase('test_motchallenge_files'))
     return suite
 
