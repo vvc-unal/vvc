@@ -16,7 +16,7 @@ class YOLOV3(object):
     classdocs
     '''
 
-    def __init__(self, model_name):
+    def __init__(self, model_name, body_name):
         '''
         Constructor
         '''
@@ -24,7 +24,8 @@ class YOLOV3(object):
         config = {
              "model_path": os.path.join(model_folder, model_name, 'weights.h5'),
              "anchors_path": os.path.join(model_folder, model_name, 'anchors.txt'),
-             "classes_path": os.path.join(model_folder, model_name, 'classes.txt')
+             "classes_path": os.path.join(model_folder, model_name, 'classes.txt'),
+             'body_name': body_name
             }
         self.yolo = YOLO(**config)
         

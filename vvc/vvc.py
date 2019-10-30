@@ -168,6 +168,7 @@ class VVC(object):
 				frame_data.timestamps['tracking'], last_time = miliseconds_from(last_time)
 								
 				# Plot tracking results
+				img_tracks = img_scaled.copy()
 				
 				for object_data in tracked_objects:
 					
@@ -184,7 +185,7 @@ class VVC(object):
 						
 						label += ' {0:.0%}'.format(object_data.probability)
 										
-					img_tracks = self.plot_box(img_scaled, box, color, label)
+					img_tracks = self.plot_box(img_tracks, box, color, label)
 				
 				# Save final image
 				img_post = img_tracks

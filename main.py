@@ -1,13 +1,13 @@
 import logging
 
-from vvc.detector.object_detection import get_detector, Model
+from vvc.detector.object_detection import get_detector, Detector
 from vvc.vvc import VVC
 
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 
 if __name__ == '__main__':
     
-    detector = get_detector(Model.RETINANET)
+    detector = get_detector(Detector.RETINANET)
     
     test_1_video = 'MOV_0861'
     

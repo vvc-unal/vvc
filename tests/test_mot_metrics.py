@@ -9,7 +9,7 @@ import unittest
 
 from vvc.format import cvat, vvc_format
 from vvc import config
-from vvc.detector.object_detection import Model
+from vvc.detector.object_detection import Detector
 
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
 
@@ -71,7 +71,7 @@ class MOTMetricsTestCase(unittest.TestCase):
             
             # Select files
             
-            for model in [Model.TINY_YOLO3, Model.RETINANET]:
+            for model in [Detector.TINY_YOLO3, Detector.RETINANET]:
                 file_name = model.value
                 
                 vvc_file = vvc_folder.joinpath(file_name + '.mp4.json')
