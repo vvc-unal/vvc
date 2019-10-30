@@ -29,9 +29,9 @@ class VVCTestCase(unittest.TestCase):
             vvc.count(video_name, frame_rate_factor=0.5)
             break
             
-        '''for video_name in self.test_videos:
+        for video_name in self.test_videos:
             vvc.count(video_name)
-            break'''
+            break
 
     def test_faster_rcnn_naive(self):
         logging.info('faster_rcnn')
@@ -42,23 +42,18 @@ class VVCTestCase(unittest.TestCase):
     
     def test_yolo_naive(self):
         logging.info('yolo v3')
-        detector = yolo_v3.YOLOV3('YOLOv3')
-        self.counting(detector)
+        for model in object_detection.yolo3_models:
+            print('Detector: {}'.format(model))
+            detector = object_detection.get_detector(model)
+            self.counting(detector)
         
-    def test_yolo_transfer_naive(self):
-        logging.info('yolo v3 transfer')
-        detector = yolo_v3.YOLOV3('YOLOv3-transfer')
-        self.counting(detector)
-        
-    def test_yolo_tiny_pretrained_naive(self):
+    def test_yolo_tiny_naive(self):
         logging.info('yolo v3 tiny')
-        detector = yolo_v3.YOLOV3('YOLOv3-tiny')
-        self.counting(detector)
         
-    def test_yolo_tiny_transfer_naive(self):
-        detector = yolo_v3.YOLOV3('YOLOv3-tiny-transfer')
-        self.counting(detector)
-    
+        for model in object_detection.tiny_yolo3_models:
+            detector = object_detection.get_detector(model)
+            self.counting(detector)
+
         
     def test_vvc_naive(self):
         logging.info('vvc')
