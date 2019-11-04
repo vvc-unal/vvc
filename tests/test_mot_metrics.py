@@ -4,14 +4,15 @@ import logging
 import os
 
 import motmetrics as mm
+import pandas as pd
 from pathlib import Path
 import unittest
 
 from vvc.format import cvat, vvc_format
 from vvc import config
-from vvc.detector.object_detection import Detector
+from vvc.detector import object_detection
 
-logging.basicConfig(format='%(asctime)s %(message)s', level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 
 
 class MOTMetricsTestCase(unittest.TestCase):
@@ -58,7 +59,7 @@ class MOTMetricsTestCase(unittest.TestCase):
             
     def test_vvc_to_motchallenge(self):
         
-        for video_name in [self.train_video, self.test_video]:
+        for video_name in [self.train_video]: #, self.test_video]:
             
             # Set video folder
             vvc_folder = Path(config.output_folder).joinpath(video_name)
@@ -70,51 +71,56 @@ class MOTMetricsTestCase(unittest.TestCase):
             mot_challenge_folder.mkdir(exist_ok = True)
             
             # Select files
-            
-            for model in [Detector.TINY_YOLO3, Detector.RETINANET]:
+            for model in object_detection.all_models:
                 file_name = model.value
-                
                 vvc_file = vvc_folder.joinpath(file_name + '.mp4.json')
                 mot_challenge_file = mot_challenge_folder.joinpath(file_name + '.txt')
                 
-                assert vvc_file.exists() 
+                assert vvc_file.exists(), 'VVC file missing, model {}'.format(file_name)
             
-            # Transform
-            
-            logging.info("Convert from VVC to MOT Challenge {}, variant: {}".format(video_name, file_name))
-            
-            df = vvc_format.to_mot_challenge(vvc_file, mot_challenge_file)
-            
-            logging.debug(df)
-            
-            assert mot_challenge_file.exists()
+                # Transform
+                
+                logging.info("Convert from VVC to MOT Challenge {}, variant: {}".format(video_name, file_name))
+                
+                df = vvc_format.to_mot_challenge(vvc_file, mot_challenge_file)
+                
+                logging.debug(df)
+                
+                assert mot_challenge_file.exists()
     
     def test_motchallenge_files(self):
-        
-        mot_challenge_folder = Path(config.video_folder).joinpath('mot_challenge')
-        
-        vvc_folder = Path(config.output_folder).joinpath(self.test_video).joinpath('mot_challenge')
-        
-        dnames = [
-            'RetinaNet-ResNet50',
-            'YOLOv3-tiny',
-        ]
-        
-        def compute_motchallenge(dname):
-            df_gt = mm.io.loadtxt(os.path.join(mot_challenge_folder, self.test_video + '.txt'))
-            df_test = mm.io.loadtxt(os.path.join(vvc_folder, dname + '.txt'))
-            return mm.utils.compare_to_groundtruth(df_gt, df_test, 'iou', distth=0.5)
-    
-        accs = [compute_motchallenge(d) for d in dnames]
-    
-        # For testing
-        #[a.events.to_pickle(n) for (a,n) in zip(accs, dnames)]
-    
-        mh = mm.metrics.create()
-        summary = mh.compute_many(accs, metrics=mm.metrics.motchallenge_metrics, names=dnames, generate_overall=False)
-    
-        print()
-        print(mm.io.render_summary(summary, namemap=mm.io.motchallenge_metric_names, formatters=mh.formatters))
+
+        for video_name in [self.train_video]: #, self.test_video]:
+            logging.info(video_name)
+
+            mot_challenge_folder = Path(config.video_folder).joinpath('mot_challenge')
+
+            vvc_folder = Path(config.output_folder).joinpath(video_name).joinpath('mot_challenge')
+
+            dnames = [d.value for d in object_detection.all_models]
+
+            def compute_mot_challenge(dname):
+                df_gt = mm.io.loadtxt(os.path.join(mot_challenge_folder, video_name + '.txt'))
+                df_test = mm.io.loadtxt(os.path.join(vvc_folder, dname + '.txt'))
+                return mm.utils.compare_to_groundtruth(df_gt, df_test, 'iou', distth=0.5)
+
+            accs = [compute_mot_challenge(d) for d in dnames]
+
+            mh = mm.metrics.create()
+            metrics = mm.metrics.motchallenge_metrics
+            partials = []
+
+            for acc, name in zip(accs, dnames):
+                if acc.events['HId'].notnull().sum() > 0:
+                    partials.append(mh.compute(acc, metrics=metrics, name=name))
+                else:
+                    df = pd.DataFrame(data=[[name] + [None] * len(metrics)], columns=['name'] + metrics)
+                    df = df.set_index('name')
+                    partials.append(df)
+            summary = pd.concat(partials)
+
+            print()
+            print(mm.io.render_summary(summary, namemap=mm.io.motchallenge_metric_names, formatters=mh.formatters))
     
     
     

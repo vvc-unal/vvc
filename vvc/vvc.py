@@ -154,7 +154,7 @@ class VVC(object):
 					tag = bbox['class']
 					
 					# Save annotations
-					if tag in filter_tags and bbox['prob'] > 0.5:
+					if tag in filter_tags: #and bbox['prob'] > 0.5:
 						object_data = frame_data.add_object()
 						object_data.tag = tag
 						object_data.box = bbox['box']

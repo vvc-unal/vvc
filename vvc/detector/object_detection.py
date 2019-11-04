@@ -8,18 +8,18 @@ class Detector(Enum):
     FRCNN = 'frcnn-resnet50'
     FRCNN_TRANSFER = 'frcnn-resnet50-transfer'
     RETINANET = 'RetinaNet-ResNet50'
-    YOLO3 = ['YOLOv3', 'yolo3']
-    YOLO3_TRANSFER = ['YOLOv3-transfer', 'yolo3']
-    YOLO3_PRUNNED = ['yolo3-prunned', 'yolo3']
-    TINY_YOLO3 = ['YOLOv3-tiny', 'tiny']
-    TINY_YOLO3_TRANSFER = ['YOLOv3-tiny-transfer', 'tiny']
-    VVC1 = ['vvc1-yolov3', 'vvc1']
-    VVC2 = ['vvc2-yolov3', 'vvc2']
-    VVC3 = ['vvc3-yolov3', 'vvc3']
+    YOLO3 = 'YOLOv3'
+    YOLO3_TRANSFER = 'YOLOv3-transfer'
+    YOLO3_PRUNNED = 'yolo3-prunned'
+    TINY_YOLO3 = 'YOLOv3-tiny'
+    TINY_YOLO3_TRANSFER = 'YOLOv3-tiny-transfer'
+    VVC1 = 'vvc1-yolov3'
+    VVC2 = 'vvc2-yolov3'
+    VVC3 = 'vvc3-yolov3'
 
 
 all_models = [Detector.FRCNN, Detector.FRCNN_TRANSFER,
-          Detector.YOLO3, Detector.YOLO3_TRANSFER, 
+          Detector.YOLO3, Detector.YOLO3_TRANSFER, Detector.YOLO3_PRUNNED, 
           Detector.TINY_YOLO3, Detector.TINY_YOLO3_TRANSFER,
           Detector.VVC1, Detector.VVC2, Detector.VVC3,
           Detector.RETINANET]
@@ -46,8 +46,18 @@ def get_detector(model):
     if model in frcnn_models:
         return faster_rcnn.FasterRCNN(model.value)
     elif model in __yolo_based_models:
-        model_name = model.value[0]
-        body_name = model.value[1]
+        detector_body = {Detector.YOLO3: 'yolo3', 
+                         Detector.YOLO3_TRANSFER: 'yolo3', 
+                         Detector.YOLO3_PRUNNED: 'yolo3',
+                         Detector.TINY_YOLO3: 'tiny', 
+                         Detector.TINY_YOLO3_TRANSFER: 'tiny',
+                         Detector.VVC1: 'vvc1', 
+                         Detector.VVC2:'vvc2', 
+                         Detector.VVC3: 'vvc3'}
+        
+        model_name = model.value
+        body_name = detector_body.get(model)
+        
         return yolo_v3.YOLOV3(model_name, body_name)
     elif model == Detector.RETINANET:
         return retinanet.RetinaNet(model.value)

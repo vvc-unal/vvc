@@ -171,7 +171,7 @@ class FasterRCNN(object):
                 # Save annotations
                 box = {}
                 box['class'] = key
-                box['box'] = new_boxes[jk, :]
+                box['box'] = new_boxes[jk, :].tolist()
                 box['prob'] = new_probs[jk]
                 final_bboxes.append(box)
                     
