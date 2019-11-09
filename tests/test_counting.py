@@ -54,7 +54,6 @@ class VVCTestCase(unittest.TestCase):
             detector = object_detection.get_detector(model)
             self.counting(detector)
 
-        
     def test_vvc_naive(self):
         logging.info('vvc')
         for model in object_detection.vvc_models:

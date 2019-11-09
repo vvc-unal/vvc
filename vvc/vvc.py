@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 from vvc import json_utils
 from vvc import config as vvc_config
-from vvc.tracker.naive_tracker import NaiveTracker
+from vvc.tracker.iou_tracker import IOUTracker
 from vvc.video_data import VideoData
 from vvc.video.skvideo_writer import SKVideoWriter
 from vvc.video.video_wrapper import VideoWrapper
@@ -46,7 +46,7 @@ def miliseconds_from(last_time):
 
 class VVC(object):
 	
-	def __init__(self, detector, tracker=NaiveTracker()):
+	def __init__(self, detector, tracker=IOUTracker()):
 		self.model_name = detector.model_name
 		self.obj_detector = detector
 		self.tracker = tracker
@@ -172,7 +172,7 @@ class VVC(object):
 				
 				for object_data in tracked_objects:
 					
-					box = object_data.box
+					box = object_data.boxes[-1]
 					color = class_to_color[object_data.tag]
 					label = '{}'.format(object_data.name)
 					
@@ -207,10 +207,10 @@ class VVC(object):
 		json_file = self.output_video_file + ".json"
 		json_utils.save_to_json(data, json_file)
 				
-	def count(self, 
-			video_name, 
-			frame_rate_factor=1, 
-			filter_tags=['bicycle', 'car', 'motorbike', 'bus', 'truck'], 
+	def count(self,
+			video_name,
+			frame_rate_factor=1,
+			filter_tags=['bicycle', 'car', 'motorbike', 'bus', 'truck'],
 			show_obj_id=True):
 		
 		self.video_name = video_name
