@@ -23,7 +23,6 @@ import tensorflow as tf
 import logging
 
 
-
 def get_session():
 	''' Set tf backend to allow memory to grow, instead of claiming everything '''
 	config = tf.ConfigProto()
@@ -42,7 +41,6 @@ def miliseconds_from(last_time):
 	diff = (now - last_time) / timedelta(microseconds=1) / 1000
 	return diff, now
 	
-
 
 class VVC(object):
 	
@@ -94,22 +92,39 @@ class VVC(object):
 		cv2.putText(img_box, text_label, text_org, cv2.FONT_HERSHEY_DUPLEX , 0.5, (0, 0, 0), 1)
 		
 		return img_box
-	
-	
-	
-	def main(self, filter_tags, show_obj_id, frame_rate):
-		
+
+	def count(self, video_name, frame_rate_factor=1, filter_tags=['bicycle', 'car', 'motorbike', 'bus', 'truck'], show_obj_id=True):
+		# Load video and parameters
+
+		logging.info('Load video and parameters')
+		input_video_file = os.path.join(vvc_config.video_folder, video_name)
+
+		video_name_no_suffix = Path(input_video_file).stem
+
+		output_folder = os.path.join(vvc_config.output_folder, video_name_no_suffix)
+		output_video_file = os.path.join(output_folder, self.model_name + '.mp4')
+
+		input_video = VideoWrapper(input_video_file)
+
+		frame_rate = input_video.avg_frame_rate()
+
+		frame_rate = frame_rate * frame_rate_factor
+
+		logging.info("Counting ...")
+
+		# Init process
+
 		data = VideoData()
 		data.timestamps['start'] = datetime.now().isoformat()
-		data.video.input_file = self.input_video_file
-		data.video.output_file = self.output_video_file
+		data.video.input_file = input_video_file
+		data.video.output_file = output_video_file
 									
-		reader = self.input_video.video_reader()
+		reader = input_video.video_reader()
 		
-		video_writer = SKVideoWriter(self.output_video_file, frame_rate)
+		video_writer = SKVideoWriter(output_video_file, frame_rate)
 	
 		frame_id = 0
-		total_frames = self.input_video.total_frames()
+		total_frames = input_video.total_frames()
 		
 		class_mapping = self.obj_detector.get_class_mapping()
 			
@@ -195,8 +210,7 @@ class VVC(object):
 				video_writer.writeFrame(img_post);
 							
 				frame_data.timestamps['postprocessing'], last_time = miliseconds_from(last_time)
-			
-		
+
 		data.timestamps['end_loop'] = datetime.now().isoformat()
 		
 		video_writer.close()
@@ -204,34 +218,9 @@ class VVC(object):
 		data.timestamps['write'] = datetime.now().isoformat()	
 		
 		# Save data to json file
-		json_file = self.output_video_file + ".json"
+		json_file = output_video_file + ".json"
 		json_utils.save_to_json(data, json_file)
-				
-	def count(self,
-			video_name,
-			frame_rate_factor=1,
-			filter_tags=['bicycle', 'car', 'motorbike', 'bus', 'truck'],
-			show_obj_id=True):
+
+		return json_file
 		
-		self.video_name = video_name
-		self.input_video_file = os.path.join(vvc_config.video_folder, video_name)
-		
-		self.tracker.__init__()
-		
-		video_name_no_suffix = Path(self.input_video_file).stem
-		
-		self.output_folder = os.path.join(vvc_config.output_folder, video_name_no_suffix)
-		self.output_video_file = os.path.join(self.output_folder, self.model_name + '.mp4')
-		
-		self.input_video = VideoWrapper(self.input_video_file)
-				
-		frame_rate = self.input_video.avg_frame_rate()
-		
-		frame_rate = frame_rate * frame_rate_factor
-		
-		print("Counting ...")
-		self.main(filter_tags=filter_tags, show_obj_id=show_obj_id, frame_rate=frame_rate)
-		
-		print("Done..")
-		
-			
+
