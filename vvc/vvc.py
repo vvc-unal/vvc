@@ -215,6 +215,8 @@ class VVC(object):
 
 				frame_data.timestamps['postprocessing'], last_time = miliseconds_from(last_time)
 
+			reader.close()
+
 		data.timestamps['end_loop'] = datetime.now().isoformat()
 
 		video_writer.close()
