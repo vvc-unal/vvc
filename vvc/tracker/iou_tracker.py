@@ -88,7 +88,7 @@ class IOUTracker:
         # Keep active track objects
         inactive_tracks = []
         for track in self.tracks:
-            if track.frames_from_last_detection <= self.patience:
+            if track.frames_from_last_detection < self.patience:
                 track.frames_from_last_detection += 1
                 if max(track.probabilities) >= self.dectection_threshold and len(track.boxes) >= self.min_track_len:
                     active_tracks.append(track)
