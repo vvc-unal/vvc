@@ -9,11 +9,12 @@ from tests.test_mot_metrics import MOTMetricsTestCase
 
 def suite():
     suite = unittest.TestSuite()
-    suite.addTest(VVCTestCase('test_yolo_tiny_naive'))
+    #suite.addTest(VVCTestCase('test_yolo_tiny_naive'))
     suite.addTest(VVCTestCase('test_vvc_naive'))
+    suite.addTest(VVCTestCase('test_retinanet_naive'))
     #suite.addTest(MOTMetricsTestCase('test_cvat_to_motchallenge_ground_truth'))
-    suite.addTest(MOTMetricsTestCase('test_vvc_to_motchallenge'))
-    suite.addTest(MOTMetricsTestCase('test_motchallenge_files'))
+    #suite.addTest(MOTMetricsTestCase('test_vvc_to_motchallenge'))
+    #suite.addTest(MOTMetricsTestCase('test_motchallenge_files'))
     return suite
 
 

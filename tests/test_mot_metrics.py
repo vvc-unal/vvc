@@ -30,7 +30,7 @@ class MOTMetricsTestCase(unittest.TestCase):
 
     def test_cvat_to_motchallenge_ground_truth(self):
         
-        cvat_ground_truth_folder = Path(config.video_folder).joinpath('cvat')
+        cvat_ground_truth_folder = Path(config.video_folder).joinpath('Bog')
             
         mot_challenge_folder = Path(config.video_folder)\
                                         .joinpath('mot_challenge')

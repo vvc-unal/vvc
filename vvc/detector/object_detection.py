@@ -1,9 +1,11 @@
 '''
 '''
-from enum import Enum
+from enum import Enum, unique
 
 from vvc.detector import faster_rcnn, yolo_v3, retinanet
 
+
+@unique
 class Detector(Enum):
     FRCNN = 'frcnn-resnet50'
     FRCNN_TRANSFER = 'frcnn-resnet50-transfer'
@@ -39,6 +41,7 @@ vvc_models = [Detector.VVC1, Detector.VVC2, Detector.VVC3]
 
 __yolo_based_models = vvc_models + yolo3_models + tiny_yolo3_models
 
+
 def get_detector(model):
     '''
     Returns and instance of a object detector.
@@ -52,7 +55,7 @@ def get_detector(model):
                          Detector.TINY_YOLO3: 'tiny', 
                          Detector.TINY_YOLO3_TRANSFER: 'tiny',
                          Detector.VVC1: 'vvc1', 
-                         Detector.VVC2:'vvc2', 
+                         Detector.VVC2: 'vvc2',
                          Detector.VVC3: 'vvc3'}
         
         model_name = model.value

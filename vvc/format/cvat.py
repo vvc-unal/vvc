@@ -18,7 +18,7 @@ def to_mot_challenge(cvat_file, mot_challenge_file):
     annotations = tree.getroot() 
     for track in annotations.iter('track'):
         
-        if track.attrib['label'] == 'vehicle':
+        if track.attrib['label'] not in ['vehicle', 'ignore']:
             track_id = track.attrib['id']
             
             for box in track:

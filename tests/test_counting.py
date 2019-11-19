@@ -3,7 +3,8 @@
 import logging
 import unittest
 
-from vvc.detector import object_detection, yolo_v3, retinanet
+from vvc.detector import object_detection, retinanet
+from vvc.tracker.iou_tracker import IOUTracker
 from vvc.vvc import VVC
 
 logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
@@ -11,27 +12,20 @@ logging.basicConfig(format='%(asctime)s %(message)s', level=logging.INFO)
 
 class VVCTestCase(unittest.TestCase):
     
-    train_videos = ['MOV_0861.mp4', 'MOV_0841.mp4', 'MOV_0866.mp4', 'MOV_0872.mp4']
-    test_videos = ['CL 53 X CRA 60 910-911.mp4', 'CL 26 X CRA 33 600-610.mp4', 'CRA 7 X CL 45 955-959.mp4']
-
+    videos = ['MOV_0861.mp4', 'CL 53 X CRA 60 910-911.mp4']
 
     def setUp(self):
         pass
-
 
     def tearDown(self):
         pass
 
     def counting(self, detector):
-        vvc = VVC(detector)
+        tracker = IOUTracker(iou_threshold=0.5, dectection_threshold=0.8, min_track_len=4, patience=2)
+        vvc = VVC(detector, tracker)
         
-        for video_name in self.train_videos:
-            vvc.count(video_name, frame_rate_factor=0.5)
-            break
-            
-        '''for video_name in self.test_videos:
-            vvc.count(video_name)
-            break'''
+        for video_name in self.videos:
+            vvc.count(video_name, frame_rate_factor=0.2)
 
     def test_faster_rcnn_naive(self):
         logging.info('faster_rcnn')
@@ -63,7 +57,6 @@ class VVCTestCase(unittest.TestCase):
         
     def test_retinanet_naive(self):
         logging.info('retinanet')
-        detector = retinanet.RetinaNet('RetinaNet-ResNet50')
+        detector = object_detection.get_detector(object_detection.Detector.RETINANET)
         self.counting(detector)
-                
-    
+
