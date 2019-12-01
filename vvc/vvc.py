@@ -182,7 +182,7 @@ class VVC(object):
 				frame_data.timestamps['detection'], last_time = miliseconds_from(last_time)
 
 				# Tracking the objects
-				tracked_objects = self.tracker.tracking(frame_data.objects)
+				tracked_objects = self.tracker.tracking(img_scaled, frame_data.objects)
 
 				frame_data.timestamps['tracking'], last_time = miliseconds_from(last_time)
 
