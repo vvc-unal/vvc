@@ -12,13 +12,14 @@ class IOUTracker(Tracker):
         '''
         Constructor
         '''
+        super().__init__()
         self.dectection_threshold = dectection_threshold
         self.iou_threshold = iou_threshold
         self.min_track_len = min_track_len
         self.tracks = []
         self.patience = patience
     
-    def tracking(self, detections):
+    def tracking(self, frame, detections):
         '''
         Process the new frame and return the tracking results
         - detection: list of object detections

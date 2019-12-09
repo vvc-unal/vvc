@@ -32,8 +32,7 @@ class MOTMetricsTestCase(unittest.TestCase):
         
         cvat_ground_truth_folder = Path(config.video_folder).joinpath('Bog')
             
-        mot_challenge_folder = Path(config.video_folder)\
-                                        .joinpath('mot_challenge')
+        mot_challenge_folder = Path(config.video_folder).joinpath('mot_challenge')
         
         mot_challenge_folder.mkdir(exist_ok = True)
         
