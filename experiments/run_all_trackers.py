@@ -1,8 +1,8 @@
 import logging
 from pathlib import Path
 
+import matplotlib.pyplot as plt
 import motmetrics
-import numpy as np
 import pandas as pd
 
 from vvc import config
@@ -14,26 +14,30 @@ from vvc.vvc import VVC
 
 logging.basicConfig(format='%(asctime)s  %(levelname)s  %(message)s', level=logging.INFO)
 
-if __name__ == '__main__':
+trackers = {
+        "patient_iou": IOUTracker(iou_threshold=0.5, dectection_threshold=0.8, min_track_len=4, patience=2),
+        "boosting": OpenCVTracker('BOOSTING'),
+        'KCF': OpenCVTracker('KCF'),
+        'TLD': OpenCVTracker('KCF'),
+        'MEDIANFLOW': OpenCVTracker('KCF'),
+    }
 
-    t_name = 'IOUTracker'
+
+def experiment():
+
     videos = ['MOV_0861.mp4']
     results = pd.DataFrame()
 
-    detector_name = object_detection.Detector.RETINANET
+    detector_name = object_detection.Detector.TINY_YOLO3
     detector = object_detection.get_detector(detector_name)
 
     mh = motmetrics.metrics.create()
-
-    trackers = {
-        "patient_iou": IOUTracker(iou_threshold=0.5, dectection_threshold=0.8, min_track_len=4, patience=2),
-        "boosting": OpenCVTracker(),
-    }
 
     for t_name, tracker in trackers.items():
         vvc = VVC(detector, tracker)
 
         accs = []
+        fps = 0
         v_names = []
 
         for video_name in videos:
@@ -55,6 +59,13 @@ if __name__ == '__main__':
                 accs.append(acc)
                 v_names.append(video_name)
 
+            # Calc fps
+            counts, times = vvc_format.to_df(vvc_file)
+            total = times['total']
+            fps = (total.count() / total.sum()) * 1000
+            tracking_time = times['tracking']
+            avg_tracking_time = tracking_time.sum() / tracking_time.count()
+
         # Summary of mot metrics for run
         summary = mh.compute_many(accs,
                                   metrics=motmetrics.metrics.motchallenge_metrics,
@@ -63,12 +74,50 @@ if __name__ == '__main__':
         logging.info('\n' + motmetrics.io.render_summary(summary,
                                                          namemap=motmetrics.io.motchallenge_metric_names,
                                                          formatters=mh.formatters))
+
+        # Calc fps
+        summary['fps'] = fps
+        summary['avg_tracking_time'] = avg_tracking_time
+
         # Save results
         summary['video'] = summary.index
-        summary['detector'] = detector_name
+        summary['detector'] = detector_name.name
         summary['tracker'] = t_name
         summary = summary.rename(columns=motmetrics.io.motchallenge_metric_names)
         results = results.append(summary, ignore_index=True)
 
     results.to_csv(Path(config.output_folder).joinpath('all_trackers.csv'), index=False, float_format='%.2f')
 
+
+def plot_results():
+    results = pd.read_csv(Path(config.output_folder).joinpath('all_trackers.csv'))
+    logging.info(results)
+    # Plot results
+    fig, ax = plt.subplots()
+
+    x_column = 'avg_tracking_time'
+
+    results['MOTA'] = results['MOTA'] * 100
+
+    for t_name, tracker in trackers.items():
+        df = results[results['tracker'] == t_name]
+        ax.scatter(x=df[x_column], y=df['MOTA'], label=t_name)
+
+    for i, row in results.iterrows():
+        plt.annotate(row["tracker"], xy=(row[x_column], row["MOTA"]))
+
+    ax.legend()
+    ax.grid(True)
+
+    ax.set_ylabel('MOTA')
+    ax.set_xlabel('Average Tracking time (ms)')
+
+    plt.tight_layout()
+
+    fig = ax.get_figure()
+    fig.savefig(Path(config.output_folder).joinpath('avg_fps.png'), dpi=300)
+
+
+if __name__ == '__main__':
+    experiment()
+    plot_results()

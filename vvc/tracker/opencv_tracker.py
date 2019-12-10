@@ -7,11 +7,24 @@ from ..utils.bbox import bbox_to_rectangle, rectangle_to_bbox
 
 class OpenCVTracker(Tracker):
 
-    def __init__(self):
+    def __init__(self, tracker_type):
+        super().__init__()
+        self.tracker_type = tracker_type
         self.tracks = []
         self.iou_threshold = 0.5
-        super().__init__()
-    
+
+    def __create_tracker(self):
+        if self.tracker_type == 'BOOSTING':
+            return cv.TrackerBoosting_create()
+        if self.tracker_type == 'MIL':
+            return cv.TrackerMIL_create()
+        if self.tracker_type == 'KCF':
+            return cv.TrackerKCF_create()
+        if self.tracker_type == 'TLD':
+            return cv.TrackerTLD_create()
+        if self.tracker_type == 'MEDIANFLOW':
+            return cv.TrackerMedianFlow_create()
+
     def tracking(self, frame, detections):
         active_tracks = []
         # Keep active track objects
@@ -53,7 +66,7 @@ class OpenCVTracker(Tracker):
             else:  # If is a one, add to tracks
                 name = self.get_next_id(tag)
                 # Initialize tracker with first frame and bounding box
-                tracker = cv.TrackerBoosting_create()
+                tracker = self.__create_tracker()
                 rectangle = bbox_to_rectangle(box)
                 tracker.init(frame, tuple(rectangle))
                 track = OpenCVTrackedObject(tracker, name, tag, box, score)
@@ -67,6 +80,5 @@ class OpenCVTracker(Tracker):
 class OpenCVTrackedObject(TrackedObject):
 
     def __init__(self, tracker, *args, **kwargs):
-        self.tracker = tracker
         super().__init__(*args, **kwargs)
-
+        self.tracker = tracker
