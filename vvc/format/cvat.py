@@ -29,10 +29,9 @@ def to_mot_challenge(cvat_file, mot_challenge_file):
                 ybr = float(box.get('ybr'))
                 occluded = int(box.get('occluded'))
 
-                if not occluded:
-                    row_df = pd.DataFrame([[frame_id, track_id, xtl, ytl, xbr - xtl, ybr - ytl]],
-                                          columns=mot_columns)
-                    mot = mot.append(row_df, ignore_index=True, sort=False)
+                row_df = pd.DataFrame([[frame_id, track_id, xtl, ytl, xbr - xtl, ybr - ytl]],
+                                      columns=mot_columns)
+                mot = mot.append(row_df, ignore_index=True, sort=False)
 
     mot = mot.sort_values(by=['frame', 'bb_left'])
 

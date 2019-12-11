@@ -15,11 +15,13 @@ from vvc.vvc import VVC
 logging.basicConfig(format='%(asctime)s  %(levelname)s  %(message)s', level=logging.INFO)
 
 trackers = {
-        "patient_iou": IOUTracker(iou_threshold=0.5, dectection_threshold=0.8, min_track_len=4, patience=2),
-        "boosting": OpenCVTracker('BOOSTING'),
+        "Patient_IOU": IOUTracker(iou_threshold=0.5, dectection_threshold=0.8, min_track_len=4, patience=2),
+        "BOOSTING": OpenCVTracker('BOOSTING'),
         'KCF': OpenCVTracker('KCF'),
-        'TLD': OpenCVTracker('KCF'),
-        'MEDIANFLOW': OpenCVTracker('KCF'),
+        'TLD': OpenCVTracker('TLD'),
+        'MEDIANFLOW': OpenCVTracker('MEDIANFLOW'),
+        'MOSSE': OpenCVTracker('MOSSE'),
+        'CSRT': OpenCVTracker('CSRT'),
     }
 
 
@@ -34,6 +36,7 @@ def experiment():
     mh = motmetrics.metrics.create()
 
     for t_name, tracker in trackers.items():
+        logging.info('Detector: {}, Tracker: {}'.format(detector_name.name, t_name))
         vvc = VVC(detector, tracker)
 
         accs = []
@@ -63,8 +66,6 @@ def experiment():
             counts, times = vvc_format.to_df(vvc_file)
             total = times['total']
             fps = (total.count() / total.sum()) * 1000
-            tracking_time = times['tracking']
-            avg_tracking_time = tracking_time.sum() / tracking_time.count()
 
         # Summary of mot metrics for run
         summary = mh.compute_many(accs,
@@ -77,7 +78,6 @@ def experiment():
 
         # Calc fps
         summary['fps'] = fps
-        summary['avg_tracking_time'] = avg_tracking_time
 
         # Save results
         summary['video'] = summary.index
@@ -95,7 +95,7 @@ def plot_results():
     # Plot results
     fig, ax = plt.subplots()
 
-    x_column = 'avg_tracking_time'
+    x_column = 'fps'
 
     results['MOTA'] = results['MOTA'] * 100
 
@@ -106,16 +106,16 @@ def plot_results():
     for i, row in results.iterrows():
         plt.annotate(row["tracker"], xy=(row[x_column], row["MOTA"]))
 
-    ax.legend()
+    #ax.legend()
     ax.grid(True)
 
-    ax.set_ylabel('MOTA')
-    ax.set_xlabel('Average Tracking time (ms)')
+    ax.set_ylabel('MOTA (%)')
+    ax.set_xlabel('FPS')
 
     plt.tight_layout()
 
     fig = ax.get_figure()
-    fig.savefig(Path(config.output_folder).joinpath('avg_fps.png'), dpi=300)
+    fig.savefig(Path(config.output_folder).joinpath('mota_vs_fps.png'), dpi=300)
 
 
 if __name__ == '__main__':

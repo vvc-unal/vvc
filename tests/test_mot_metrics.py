@@ -19,11 +19,9 @@ class MOTMetricsTestCase(unittest.TestCase):
     
     train_video = 'MOV_0861'
     test_video = 'CL 53 X CRA 60 910-911'
-    
 
     def setUp(self):
         pass
-
 
     def tearDown(self):
         pass

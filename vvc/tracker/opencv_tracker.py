@@ -24,6 +24,10 @@ class OpenCVTracker(Tracker):
             return cv.TrackerTLD_create()
         if self.tracker_type == 'MEDIANFLOW':
             return cv.TrackerMedianFlow_create()
+        if self.tracker_type == 'MOSSE':
+            return cv.TrackerMOSSE_create()
+        if self.tracker_type == 'CSRT':
+            return cv.TrackerCSRT_create()
 
     def tracking(self, frame, detections):
         active_tracks = []
