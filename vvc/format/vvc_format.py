@@ -2,7 +2,7 @@
 import json
 import pandas as pd
 
-from vvc import json_utils
+from vvc.utils import json_utils
 
 
 def to_df(json_file):

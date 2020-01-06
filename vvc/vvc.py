@@ -8,7 +8,7 @@ import numpy as np
 from pathlib import Path
 from tqdm import tqdm
 
-from vvc import json_utils
+from vvc.utils import json_utils
 from vvc import config as vvc_config
 from vvc.tracker.iou_tracker import IOUTracker
 from vvc.video_data import VideoData
