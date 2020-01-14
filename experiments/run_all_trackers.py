@@ -24,6 +24,8 @@ trackers = {
         'CSRT': OpenCVTracker('CSRT'),
     }
 
+results_folder = Path(config.output_folder).joinpath('Results')
+csv_path = results_folder.joinpath('all_trackers.csv')
 
 def experiment():
 
@@ -86,38 +88,56 @@ def experiment():
         summary = summary.rename(columns=motmetrics.io.motchallenge_metric_names)
         results = results.append(summary, ignore_index=True)
 
-    results.to_csv(Path(config.output_folder).joinpath('all_trackers.csv'), index=False, float_format='%.2f')
+    results.to_csv(csv_path, index=False, float_format='%.2f')
 
 
 def plot_results():
-    results = pd.read_csv(Path(config.output_folder).joinpath('all_trackers.csv'))
-    logging.info(results)
-    # Plot results
-    fig, ax = plt.subplots()
+    measurements = {'MOTA': {'better': 'higher', 'perfect': '100%'},
+                    'MOTP': {'better': 'higher', 'perfect': '100%'},
+                    'MT': {'better': 'higher', 'perfect': '100%'},
+                    'ML': {'better': 'lower', 'perfect': '0%'},
+                    'IDs': {'better': 'lower', 'perfect': '0'},
+                    'FM': {'better': 'lower', 'perfect': '0'},
+                    'FP': {'better': 'lower', 'perfect': '0'},
+                    'FN': {'better': 'lower', 'perfect': '0'}
+                    }
 
+    results = pd.read_csv(csv_path)
+
+    # preprocessing
+    results = results[results['video'] == 'OVERALL']
+    results['MOTP'] = (1 - results['MOTP']) * 100
+    results['MOTA'] = results['MOTA'] * 100
+    results[['MT', 'ML']] = results[['MT', 'ML']].div(results['GT'], axis=0)
+    logging.info(results)
+
+    # Plot results
+
+    ax_index = 0
     x_column = 'fps'
 
-    results['MOTA'] = results['MOTA'] * 100
+    for measure, properties in measurements.items():
+        fig, ax = plt.subplots()
 
-    for t_name, tracker in trackers.items():
-        df = results[results['tracker'] == t_name]
-        ax.scatter(x=df[x_column], y=df['MOTA'], label=t_name)
+        for t_name, tracker in trackers.items():
+            df = results[results['tracker'] == t_name]
+            x = df[x_column]
+            y = df[measure]
+            ax.scatter(x=x, y=y, label=t_name)
+            ax.annotate(t_name, xy=(x, y))
 
-    for i, row in results.iterrows():
-        plt.annotate(row["tracker"], xy=(row[x_column], row["MOTA"]))
+        #ax.legend()
+        ax.grid(True)
 
-    #ax.legend()
-    ax.grid(True)
+        ax.set_ylabel('{}'.format(measure) + ('(%)' if '%' in properties['perfect'] else ''))
+        ax.set_xlabel('FPS')
 
-    ax.set_ylabel('MOTA (%)')
-    ax.set_xlabel('FPS')
+        plt.tight_layout()
 
-    plt.tight_layout()
-
-    fig = ax.get_figure()
-    fig.savefig(Path(config.output_folder).joinpath('mota_vs_fps.png'), dpi=300)
-
+        #fig = ax.get_figure()
+        img_path = results_folder.joinpath('{}_vs_fps.png'.format(measure))
+        fig.savefig(img_path, dpi=300)
 
 if __name__ == '__main__':
-    experiment()
+    #experiment()
     plot_results()
