@@ -3,6 +3,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import motmetrics
+import numpy as np
 import pandas as pd
 
 from vvc import config
@@ -26,6 +27,7 @@ trackers = {
 
 results_folder = Path(config.output_folder).joinpath('Results')
 csv_path = results_folder.joinpath('all_trackers.csv')
+
 
 def experiment():
 
@@ -92,14 +94,14 @@ def experiment():
 
 
 def plot_results():
-    measurements = {'MOTA': {'better': 'higher', 'perfect': '100%'},
-                    'MOTP': {'better': 'higher', 'perfect': '100%'},
-                    'MT': {'better': 'higher', 'perfect': '100%'},
-                    'ML': {'better': 'lower', 'perfect': '0%'},
-                    'IDs': {'better': 'lower', 'perfect': '0'},
-                    'FM': {'better': 'lower', 'perfect': '0'},
-                    'FP': {'better': 'lower', 'perfect': '0'},
-                    'FN': {'better': 'lower', 'perfect': '0'}
+    measurements = {'MOTA': {'better': 'higher', 'perfect': '100%', 'title': 'MOTA'},
+                    'MOTP': {'better': 'higher', 'perfect': '100%', 'title': 'MOTA'},
+                    'MT': {'better': 'higher', 'perfect': '100%', 'title': 'Mostly tracked targets'},
+                    'ML': {'better': 'lower', 'perfect': '0%', 'title': 'Mostly lost targets'},
+                    'IDs': {'better': 'lower', 'perfect': '0', 'title': 'Identity switches'},
+                    'FM': {'better': 'lower', 'perfect': '0', 'title': 'Fragmentations'},
+                    'FP': {'better': 'lower', 'perfect': '0', 'title': 'False positives'},
+                    'FN': {'better': 'lower', 'perfect': '0', 'title': 'False negatives'}
                     }
 
     results = pd.read_csv(csv_path)
@@ -111,32 +113,48 @@ def plot_results():
     results[['MT', 'ML']] = results[['MT', 'ML']].div(results['GT'], axis=0)
     logging.info(results)
 
-    # Plot results
+    # Fixing random state for reproducibility
+    np.random.seed(19680801)
 
-    ax_index = 0
+    # Plot results
     x_column = 'fps'
+    filled_markers = ('o', 'v', '>', 's', 'P', 'X', 'D')
 
     for measure, properties in measurements.items():
         fig, ax = plt.subplots()
+        marker_index = 0
 
         for t_name, tracker in trackers.items():
             df = results[results['tracker'] == t_name]
             x = df[x_column]
             y = df[measure]
-            ax.scatter(x=x, y=y, label=t_name)
-            ax.annotate(t_name, xy=(x, y))
+            detector_name = df['detector'].values[0]
+            ax.scatter(x=x, y=y, label=t_name, marker=filled_markers[marker_index])
+            ax.annotate(detector_name,
+                        xy=(x, y),
+                        xytext=(0, 6),  # n points vertical offset
+                        textcoords="offset points",
+                        size=6,
+                        ha='center')
+            marker_index += 1
 
-        #ax.legend()
+        ax.legend(loc='lower left', ncol=2, fontsize='x-small')
         ax.grid(True)
 
-        ax.set_ylabel('{}'.format(measure) + ('(%)' if '%' in properties['perfect'] else ''))
+        ax.set_title(properties['title'])
+        if 'lower' == properties['better']:
+            ax.invert_yaxis()
+
+        ax.set_ylabel('{} {} ({} is better)'.format(measure,
+                                                    ' (%)' if '%' in properties['perfect'] else '',
+                                                    properties['better']))
         ax.set_xlabel('FPS')
 
         plt.tight_layout()
 
-        #fig = ax.get_figure()
         img_path = results_folder.joinpath('{}_vs_fps.png'.format(measure))
         fig.savefig(img_path, dpi=300)
+
 
 if __name__ == '__main__':
     #experiment()
