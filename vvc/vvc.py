@@ -211,7 +211,7 @@ class VVC(object):
 
 				img_post = cv2.cvtColor(img_post, cv2.COLOR_RGB2BGR)
 
-				video_writer.writeFrame(img_post);
+				video_writer.writeFrame(img_post)
 
 				frame_data.timestamps['postprocessing'], last_time = miliseconds_from(last_time)
 

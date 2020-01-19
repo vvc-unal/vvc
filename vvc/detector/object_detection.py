@@ -21,10 +21,10 @@ class Detector(Enum):
 
 
 all_models = [Detector.FRCNN, Detector.FRCNN_TRANSFER,
-          Detector.YOLO3, Detector.YOLO3_TRANSFER, Detector.YOLO3_PRUNNED, 
-          Detector.TINY_YOLO3, Detector.TINY_YOLO3_TRANSFER,
-          Detector.VVC1, Detector.VVC2, Detector.VVC3,
-          Detector.RETINANET]
+              Detector.YOLO3, Detector.YOLO3_TRANSFER,
+              Detector.TINY_YOLO3, Detector.TINY_YOLO3_TRANSFER,
+              Detector.VVC1, Detector.VVC2, Detector.VVC3,
+              Detector.RETINANET]
 
 basic_models = [Detector.FRCNN, Detector.FRCNN_TRANSFER, 
                 Detector.YOLO3, Detector.YOLO3_TRANSFER, Detector.YOLO3_PRUNNED,
@@ -33,7 +33,9 @@ basic_models = [Detector.FRCNN, Detector.FRCNN_TRANSFER,
 
 frcnn_models = [Detector.FRCNN, Detector.FRCNN_TRANSFER]
 
-yolo3_models = [Detector.YOLO3, Detector.YOLO3_TRANSFER, Detector.YOLO3_PRUNNED]
+retinanet_models = [Detector.RETINANET]
+
+yolo3_models = [Detector.YOLO3, Detector.YOLO3_TRANSFER]
 
 tiny_yolo3_models = [Detector.TINY_YOLO3, Detector.TINY_YOLO3_TRANSFER]
 
@@ -64,5 +66,3 @@ def get_detector(model):
         return yolo_v3.YOLOV3(model_name, body_name)
     elif model == Detector.RETINANET:
         return retinanet.RetinaNet(model.value)
-    
-    
