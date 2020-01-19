@@ -14,9 +14,10 @@ import numpy as np
 
 from vvc import config as vvc_config
 
+
 class FasterRCNN(object):
     
-    def __init__(self, model_name, num_rois = 32):
+    def __init__(self, model_name, num_rois=32):
         #sys.setrecursionlimit(40000)
         
         self.model_name = model_name
@@ -169,9 +170,14 @@ class FasterRCNN(object):
             
             for jk in range(new_boxes.shape[0]):                
                 # Save annotations
-                box = {}
-                box['class'] = key
-                box['box'] = new_boxes[jk, :].tolist()
+                box = {'class': key, 'box': new_boxes[jk, :].tolist()}
+                # Rectify box
+                box_x1 = box['box'][2]
+                box_y1 = box['box'][3]
+                if box_x1 > X.shape[2] or box_y1 > X.shape[1]:
+                    box['box'][2] = min(box_x1, X.shape[2])
+                    box['box'][3] = min(box_y1, X.shape[1])
+
                 box['prob'] = new_probs[jk]
                 final_bboxes.append(box)
                     
