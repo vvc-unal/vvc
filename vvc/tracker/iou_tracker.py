@@ -12,7 +12,7 @@ class IOUTracker(Tracker):
         '''
         Constructor
         '''
-        super().__init__()
+        super().__init__('PatientIOU')
         self.dectection_threshold = dectection_threshold
         self.iou_threshold = iou_threshold
         self.min_track_len = min_track_len

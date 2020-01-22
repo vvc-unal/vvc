@@ -1,7 +1,8 @@
 
 class Tracker:
 
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
         self.last_tags_id = {}
 
     @staticmethod

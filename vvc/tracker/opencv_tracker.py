@@ -10,7 +10,7 @@ from ..utils.bbox import bbox_to_rectangle, rectangle_to_bbox
 class OpenCVTracker(Tracker):
 
     def __init__(self, tracker_type):
-        super().__init__()
+        super().__init__(tracker_type)
         self.tracker_type = tracker_type
         self.tracks = []
         self.iou_threshold = 0.5

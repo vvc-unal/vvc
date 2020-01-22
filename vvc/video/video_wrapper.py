@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 class VideoWrapper(object):
     
     def __init__(self, video_path):
-        self.video_path = video_path
+        self.video_path = str(video_path)
 
     def video_reader(self):
         '''

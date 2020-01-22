@@ -35,7 +35,6 @@ def experiment():
 
     for detector_name in object_detection.vvc_models:
         detector = object_detection.get_detector(detector_name)
-
         mh = motmetrics.metrics.create()
 
         for t_name, tracker in trackers.items():
