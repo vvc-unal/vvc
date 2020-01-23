@@ -91,7 +91,6 @@ class VVC(object):
         self.model_name = detector.model_name
         self.obj_detector = detector
         self.tracker = tracker
-        init_keras()
 
     def count(self, video_name, frame_rate_factor=1, filter_tags=None, show_obj_id=True):
         # Load video and parameters

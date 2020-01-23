@@ -10,7 +10,7 @@ from vvc.detector import object_detection
 from vvc.format import vvc_format
 from vvc.tracker.iou_tracker import IOUTracker
 from vvc.tracker.opencv_tracker import OpenCVTracker
-from vvc.vvc import VVC
+from vvc.vvc import VVC, init_keras
 
 logging.basicConfig(format='%(asctime)s  %(levelname)s  %(message)s', level=logging.INFO)
 
@@ -32,8 +32,9 @@ def experiment():
 
     videos = ['MOV_0861.mp4']
     results = pd.DataFrame()
+    init_keras()
 
-    for detector_name in object_detection.vvc_models:
+    for detector_name in object_detection.all_models:
         detector = object_detection.get_detector(detector_name)
         mh = motmetrics.metrics.create()
 
@@ -120,42 +121,48 @@ def plot_results():
     ax_index = 0
 
     for measure, properties in measurements.items():
-        ax = axes.reshape(-1)[ax_index]
+        sub_ax = axes.reshape(-1)[ax_index]
         ax_index += 1
-        marker_index = 0
 
-        for t_name, tracker in trackers.items():
-            df = results[results['tracker'] == t_name]
-            x = df[x_column]
-            y = df[measure]
-            ax.scatter(x=x, y=y, label=t_name, marker=filled_markers[marker_index], cmap='Set1')
-            for index, row in df.iterrows():
-                ax.annotate(row['detector'],
-                            xy=(row[x_column], row[measure]),
-                            xytext=(0, 6),  # n points vertical offset
-                            textcoords="offset points",
-                            size=5,
-                            ha='center')
-            marker_index += 1
+        single_fig, single_ax = plt.subplots()
 
-        ax.legend(loc='lower left', ncol=2, fontsize='x-small')
-        ax.grid(True)
+        for ax in [sub_ax, single_ax]:
+            marker_index = 0
+            for t_name, tracker in trackers.items():
+                df = results[results['tracker'] == t_name]
+                x = df[x_column]
+                y = df[measure]
+                ax.scatter(x=x, y=y, label=t_name, marker=filled_markers[marker_index], cmap='Set1')
+                for index, row in df.iterrows():
+                    ax.annotate(row['detector'],
+                                xy=(row[x_column], row[measure]),
+                                xytext=(0, 6),  # n points vertical offset
+                                textcoords="offset points",
+                                size=5,
+                                ha='center')
+                marker_index += 1
 
-        ax.set_title(properties['title'])
-        ylabel = '{} {}'.format(measure, '(%)' if '%' in properties['perfect'] else '')
+            ax.legend(loc='lower left', ncol=2, fontsize='x-small')
+            ax.grid(True)
 
-        if 'lower' == properties['better']:
-            ax.invert_yaxis()
-            ylabel += ' ({} is better)'.format(properties['better'])
+            ax.set_title(properties['title'])
+            ylabel = '{} {}'.format(measure, '(%)' if '%' in properties['perfect'] else '')
 
-        ax.set_ylabel(ylabel)
+            if 'lower' == properties['better']:
+                ax.invert_yaxis()
+                ylabel += ' ({} is better)'.format(properties['better'])
 
-        ax.set_xlabel('FPS')
+            ax.set_ylabel(ylabel)
 
-        fig.tight_layout()
+            ax.set_xlabel('FPS')
 
+        single_fig.tight_layout()
         img_path = results_folder.joinpath('{}_vs_fps.png'.format(measure))
-        fig.savefig(img_path, dpi=300)
+        single_fig.savefig(img_path, dpi=300)
+
+    fig.tight_layout()
+    img_path = results_folder.joinpath('all_vs_fps.png')
+    fig.savefig(img_path, dpi=300)
 
 
 if __name__ == '__main__':
