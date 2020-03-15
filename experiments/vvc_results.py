@@ -24,6 +24,7 @@ trackers = {
         'CSRT': OpenCVTracker('CSRT'),
     }
 
+mot_challenge_folder = Path(config.video_folder).joinpath('mot_challenge')
 results_folder = Path(config.output_folder).joinpath('Results')
 csv_path = results_folder.joinpath('all_trackers.csv')
 
@@ -47,7 +48,7 @@ def experiment():
             v_names = []
 
             for video_name in videos:
-                mot_challenge_folder = Path(config.video_folder).joinpath('mot_challenge')
+
                 ground_true_file = mot_challenge_folder.joinpath(Path(video_name).stem + '.txt')
                 assert ground_true_file.exists()
 
