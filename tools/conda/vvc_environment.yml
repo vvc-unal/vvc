@@ -4,13 +4,13 @@ channels:
   - conda-forge
 dependencies:
   - cudatoolkit=10.1
-  - keras-gpu=2.1
+  - keras-gpu=2.3
   - jupyter
   - nomkl # The processing will be done by the GPU
   - matplotlib
   - pandas
   - pip
-  - python=3.6
+  - python=3.7
   - tensorflow-gpu=1.14
   - tqdm
   - pip:
