@@ -24,7 +24,7 @@ trackers = {
         'CSRT': OpenCVTracker('CSRT'),
     }
 
-results_folder = Path(config.output_folder).joinpath('Results')
+results_folder = Path(config.output_folder).joinpath('Results').joinpath('2020-01-26')
 csv_path = results_folder.joinpath('all_trackers.csv')
 
 
@@ -93,15 +93,16 @@ def experiment():
 
 
 def plot_results():
-    measurements = {'MOTA': {'better': 'higher', 'perfect': '100%', 'title': 'MOTA'},
-                    'MOTP': {'better': 'higher', 'perfect': '100%', 'title': 'MOTP'},
-                    'MT': {'better': 'higher', 'perfect': '100%', 'title': 'Mostly tracked targets'},
-                    'ML': {'better': 'lower', 'perfect': '0%', 'title': 'Mostly lost targets'},
-                    'IDs': {'better': 'lower', 'perfect': '0', 'title': 'Identity switches'},
-                    'FM': {'better': 'lower', 'perfect': '0', 'title': 'Fragmentations'},
-                    'FP': {'better': 'lower', 'perfect': '0', 'title': 'False positives'},
-                    'FN': {'better': 'lower', 'perfect': '0', 'title': 'False negatives'}
-                    }
+    measurements = {
+        'MOTA': {'better': 'higher', 'perfect': '100%', 'title': 'MOTA', 'legend_loc': 'upper left'},
+        'MOTP': {'better': 'higher', 'perfect': '100%', 'title': 'MOTP', 'legend_loc': 'upper left'},
+        'MT': {'better': 'higher', 'perfect': '100%', 'title': 'Mostly tracked targets', 'legend_loc': 'lower center'},
+        'ML': {'better': 'lower', 'perfect': '0%', 'title': 'Mostly lost targets', 'legend_loc': 'lower left'},
+        'IDs': {'better': 'lower', 'perfect': '0', 'title': 'Identity switches', 'legend_loc': 'upper left'},
+        'FM': {'better': 'lower', 'perfect': '0', 'title': 'Fragmentations', 'legend_loc': 'upper left'},
+        'FP': {'better': 'lower', 'perfect': '0', 'title': 'False positives', 'legend_loc': 'upper left'},
+        'FN': {'better': 'lower', 'perfect': '0', 'title': 'False negatives', 'legend_loc': 'lower center'}
+    }
 
     results = pd.read_csv(csv_path, sep=';', decimal=',')
 
@@ -130,31 +131,32 @@ def plot_results():
             marker_index = 0
             for t_name, tracker in trackers.items():
                 df = results[results['tracker'] == t_name]
-                x = df[x_column]
-                y = df[measure]
+                y = df[x_column]
+                x = df[measure]
                 ax.scatter(x=x, y=y, label=t_name, marker=filled_markers[marker_index], cmap='Set1')
                 for index, row in df.iterrows():
                     ax.annotate(row['detector'],
-                                xy=(row[x_column], row[measure]),
-                                xytext=(0, 6),  # n points vertical offset
+                                xy=(row[measure], row[x_column]),
+                                xytext=(0, 5),  # n points vertical offset
                                 textcoords="offset points",
-                                size=5,
+                                size=4,
                                 ha='center')
                 marker_index += 1
 
-            ax.legend(loc='lower left', ncol=2, fontsize='x-small')
+            ax.legend(loc=properties['legend_loc'], ncol=2, fontsize='xx-small')
             ax.grid(True)
 
             ax.set_title(properties['title'])
             ylabel = '{} {}'.format(measure, '(%)' if '%' in properties['perfect'] else '')
 
             if 'lower' == properties['better']:
-                ax.invert_yaxis()
+                ax.invert_xaxis()
                 ylabel += ' ({} is better)'.format(properties['better'])
 
-            ax.set_ylabel(ylabel)
+            ax.set_xlabel(ylabel)
+            #ax.set_xscale('symlog', basex=2, linthreshx=800)
 
-            ax.set_xlabel('FPS')
+            ax.set_ylabel('FPS')
 
         single_fig.tight_layout()
         img_path = results_folder.joinpath('{}_vs_fps.png'.format(measure))
@@ -166,5 +168,5 @@ def plot_results():
 
 
 if __name__ == '__main__':
-    experiment()
+    #experiment()
     plot_results()
